@@ -42,9 +42,6 @@ public class Timetable extends BaseEntity {
     private LocalTime endTime;
 
     @Column(nullable = false)
-    private Boolean freeSlot; // assumption (DDL malformed)
-
-    @Column(nullable = false)
     private String classroom;
 
     @Column(length = 50, nullable = false)
