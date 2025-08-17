@@ -7,8 +7,8 @@ export default function MiniPurpleBtn({
       onClick={onClick}
       disabled={disabled}
       style={{
-        display: 'flex',
-        width: 'auto',
+        display: 'inline-flex',
+        width: 'fit-content',
         minWidth: '65px',
         height: '35px',
         padding: '11px 5px',
@@ -16,9 +16,9 @@ export default function MiniPurpleBtn({
         alignItems: 'center',
         gap: '10px',
         borderRadius: '5px',
-        background: '#F0EFFE',
+        background: 'var(--button-violet)',
         border: 'none',
-        color: 'var(--color-success-dark)',
+        color: 'var(--support-success-dark)',
         textAlign: 'center',
         fontSize: 'var(--font-size-s)',
         fontStyle: 'normal',
@@ -26,7 +26,9 @@ export default function MiniPurpleBtn({
         lineHeight: '16px',
         letterSpacing: '0.12px',
         cursor: disabled ? 'default' : 'pointer',
-        opacity: disabled ? 0.6 : 1
+        opacity: disabled ? 0.6 : 1,
+        flexShrink: 0,
+        flex: 'none'
       }}
     >
       <span className="truncate">{label}</span>

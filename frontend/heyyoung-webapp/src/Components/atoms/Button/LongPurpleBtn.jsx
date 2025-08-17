@@ -14,7 +14,7 @@ export default function LongPurpleBtn({
         justifyContent: 'center',
         alignItems: 'center',
         gap: '8px',
-        borderRadius: '12px',
+        borderRadius: 'var(--radius-md)',
         background: 'var(--Highlight-BackGround)',
         border: 'none',
         color: 'var(--neutral-light-lightest)',

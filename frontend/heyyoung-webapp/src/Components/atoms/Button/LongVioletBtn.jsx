@@ -8,13 +8,13 @@ export default function LongVioletBtn({
       disabled={disabled}
       style={{
         display: 'flex',
-        width: '327px',
-        height: '48px',
+        width: '300px',
+        height: '45px',
         padding: '12px 16px',
         justifyContent: 'center',
         alignItems: 'center',
         gap: '8px',
-        borderRadius: '12px',
+        borderRadius: 'var(--radius-md)',
         background: 'var(--color-highlight)',
         border: 'none',
         color: 'var(--neutral-light-lightest)',
