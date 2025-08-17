@@ -8,6 +8,9 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+import org.locationtech.jts.geom.Point;
 
 @Entity @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -27,11 +30,9 @@ public class University extends BaseEntity {
     @Column(length = 300, nullable = false)
     private String address;
 
-    @Column(length = 100, nullable = false)
-    private String cityDistrict;
-
-    @Column(length = 100, nullable = false)
-    private String province;
+    @Column(columnDefinition = "geometry(Point, 4326)")
+    @JdbcTypeCode(SqlTypes.GEOMETRY)
+    private Point location;
 
     @Column(length = 20, nullable = false)
     private String postalCode;

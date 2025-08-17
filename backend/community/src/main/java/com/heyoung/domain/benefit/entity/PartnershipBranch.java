@@ -7,8 +7,10 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.BatchSize;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+import org.locationtech.jts.geom.Point;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Entity @Getter
@@ -23,11 +25,9 @@ public class PartnershipBranch extends BaseEntity {
     @Column(length = 500)
     private String address;
 
-    @Column(precision = 10, scale = 8)
-    private BigDecimal latitude;
-
-    @Column(precision = 11, scale = 8)
-    private BigDecimal longitude;
+    @Column(columnDefinition = "geometry(Point, 4326)")
+    @JdbcTypeCode(SqlTypes.GEOMETRY)
+    private Point location;
 
     @Column(length = 20)
     private String phone;
