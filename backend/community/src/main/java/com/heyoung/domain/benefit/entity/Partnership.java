@@ -5,10 +5,14 @@ import com.heyoung.global.entity.BaseEntity;
 import com.heyoung.global.enums.PartnershipCategory;
 import com.heyoung.global.enums.PartnershipStatus;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 
-@Entity
+@Entity @Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Partnership extends BaseEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

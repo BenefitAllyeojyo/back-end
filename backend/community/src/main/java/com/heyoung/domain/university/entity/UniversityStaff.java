@@ -3,9 +3,13 @@ package com.heyoung.domain.university.entity;
 import com.heyoung.global.entity.BaseEntity;
 import com.heyoung.global.enums.StaffRole;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.BatchSize;
 
-@Entity
+@Entity @Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class UniversityStaff extends BaseEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

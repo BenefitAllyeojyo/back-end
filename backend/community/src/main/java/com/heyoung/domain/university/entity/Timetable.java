@@ -3,10 +3,14 @@ package com.heyoung.domain.university.entity;
 import com.heyoung.global.entity.BaseEntity;
 import com.heyoung.global.enums.Weekday;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalTime;
 
-@Entity
+@Entity @Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Timetable extends BaseEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

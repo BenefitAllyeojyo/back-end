@@ -4,13 +4,17 @@ import com.heyoung.domain.user.entity.User;
 import com.heyoung.global.enums.PartnershipCategory;
 import com.heyoung.global.enums.TransactionStatus;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.BatchSize;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-@Entity
+@Entity @Getter
 @Table(name = "`transactions`")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Transaction {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

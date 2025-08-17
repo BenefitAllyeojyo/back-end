@@ -5,11 +5,12 @@ import com.heyoung.global.entity.BaseEntity;
 import com.heyoung.global.enums.UniversityAccess;
 import com.heyoung.global.enums.UniversityType;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-import java.util.ArrayList;
-import java.util.List;
-
-@Entity
+@Entity @Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class University extends BaseEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

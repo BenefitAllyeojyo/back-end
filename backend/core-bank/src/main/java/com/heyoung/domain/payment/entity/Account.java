@@ -4,11 +4,15 @@ import com.heyoung.domain.user.entity.User;
 import com.heyoung.global.entity.BaseEntity;
 import com.heyoung.global.enums.BankCode;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-@Entity
+@Entity @Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(uniqueConstraints = @UniqueConstraint(name="uq_account_number", columnNames="accountNumber"))
 public class Account extends BaseEntity {
 

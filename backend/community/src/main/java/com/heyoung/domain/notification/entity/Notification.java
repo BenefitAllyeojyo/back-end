@@ -5,8 +5,12 @@ import com.heyoung.global.enums.NotificationChannel;
 import com.heyoung.global.enums.NotificationType;
 import com.heyoung.global.enums.SendStatus;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-@Entity
+@Entity @Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Notification extends BaseEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
