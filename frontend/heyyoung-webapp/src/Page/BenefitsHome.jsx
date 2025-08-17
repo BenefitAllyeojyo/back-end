@@ -1,7 +1,7 @@
 import { useEffect, useCallback } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { fetchBenefits } from '@/Redux/slices/benefitsSlice'
-import BenefitCard from '@/Components/molecules/BenefitCard/BenefitCard'
+import BenefitCard from '@/Components/molecules/CardGrp/BenefitCard'
 
 export default function BenefitsHome(){
   const dispatch = useDispatch()
