@@ -15,20 +15,4 @@ public class BaseEntity {
     private LocalDateTime createdDate;
     @LastModifiedDate
     private LocalDateTime updatedDate;
-
-    public LocalDateTime getCreatedDate() {
-        return createdDate;
-    }
-
-    public void setCreatedDate() {
-        this.createdDate = LocalDateTime.now().withNano(0);
-    }
-
-    public LocalDateTime getUpdatedDate() {
-        return updatedDate;
-    }
-
-    public void setUpdatedDate() {
-        this.updatedDate = LocalDateTime.now().withNano(0);
-    }
 }
