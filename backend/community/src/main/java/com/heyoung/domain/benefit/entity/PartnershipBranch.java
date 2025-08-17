@@ -32,7 +32,7 @@ public class PartnershipBranch extends BaseEntity {
     @Column(length = 20)
     private String phone;
 
-    @Column(columnDefinition = "json")
+    @Column(columnDefinition = "jsonb")
     private String businessHoursJson;
 
     @Column(nullable = false)

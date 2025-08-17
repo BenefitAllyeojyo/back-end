@@ -27,12 +27,12 @@ public class UserBenefitHistory extends BaseEntity {
     @Column(length = 16, nullable = false)
     private ApplicationType applicationType;
 
-    @Column(columnDefinition = "json", nullable = false)
-    private String benefitSnapshotJson; // snapshot of partnership/branch if needed
+    @Column(columnDefinition = "jsonb", nullable = false)
+    private String benefitSnapshotJson;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
-    private User userId; // scalar reference to community user
+    private User userId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "transaction_id", nullable = false)
