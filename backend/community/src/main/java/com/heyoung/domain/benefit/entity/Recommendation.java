@@ -34,6 +34,5 @@ public class Recommendation extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "partnership_id", nullable = false)
-    @BatchSize(size = 50)
     private Partnership partnership;
 }

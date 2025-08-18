@@ -36,6 +36,5 @@ public class UserBenefitHistory extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "transaction_id", nullable = false)
-    @BatchSize(size = 50)
     private Transaction transaction;
 }

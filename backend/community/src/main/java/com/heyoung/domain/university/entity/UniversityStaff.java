@@ -37,6 +37,5 @@ public class UniversityStaff extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "university_id", nullable = false)
-    @BatchSize(size = 50)
     private University university;
 }

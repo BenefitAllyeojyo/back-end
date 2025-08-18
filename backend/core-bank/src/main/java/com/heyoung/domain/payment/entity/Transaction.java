@@ -48,6 +48,5 @@ public class Transaction {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "account_id", nullable = false)
-    @BatchSize(size = 50)
     private Account account;
 }
