@@ -11,9 +11,7 @@ export default function CharacterBtn({
         height: '80px',
         flexShrink: 0,
         borderRadius: '50%',
-        background: imageUrl 
-          ? `url(${imageUrl}) lightgray 50% / cover no-repeat`
-          : 'var(--color-highlight)',
+        background: 'var(--Highlight-BackGround)',
         border: 'none',
         display: 'flex',
         justifyContent: 'center',
@@ -40,7 +38,15 @@ export default function CharacterBtn({
         }
       }}
     >
-      {!imageUrl && '🐱'}
+      <img 
+        src={imageUrl}
+        alt="PLI Face"
+        style={{
+          width: 'auto',
+          height: '66px',
+          objectFit: 'contain'
+        }}
+      />
     </button>
   )
 }

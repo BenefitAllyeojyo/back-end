@@ -37,6 +37,15 @@ export default function SquareWhiteBtn({
         }
       }}
     >
+      <img 
+        src="/src/assets/images/character/PLI_Face.png"
+        alt="PLI Face"
+        style={{
+          width: '75px',
+          height: '75px',
+          alignSelf: 'flex-start'
+        }}
+      />
       <span 
         style={{
           alignSelf: 'stretch',

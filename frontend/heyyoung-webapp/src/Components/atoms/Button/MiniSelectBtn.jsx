@@ -3,27 +3,33 @@ import { useState } from 'react'
 export default function MiniSelectBtn({
   label, onClick, disabled = false
 }) {
-  const [isHovered, setIsHovered] = useState(false)
+  const [isSelected, setIsSelected] = useState(false)
+
+  const handleClick = () => {
+    if (!disabled) {
+      setIsSelected(!isSelected)
+      if (onClick) onClick()
+    }
+  }
 
   return (
     <button
       type="button"
-      onClick={onClick}
+      onClick={handleClick}
       disabled={disabled}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
       style={{
-        display: 'flex',
+        display: 'inline-flex',
+        width: 'fit-content',
         padding: '6px 8px',
         justifyContent: 'center',
         alignItems: 'center',
         gap: '4px',
-        borderRadius: '12px',
-        background: isHovered && !disabled 
+        borderRadius: 'var(--radius-md)',
+        background: isSelected && !disabled 
           ? 'var(--color-highlight)' 
           : 'var(--color-highlight-weak)',
         border: 'none',
-        color: isHovered && !disabled 
+        color: isSelected && !disabled 
           ? 'var(--neutral-light-lightest)' 
           : 'var(--color-highlight)',
         textAlign: 'center',

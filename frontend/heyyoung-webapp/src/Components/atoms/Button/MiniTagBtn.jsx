@@ -1,20 +1,21 @@
 export default function MiniTagBtn({
   label, onClick, disabled = false
 }) {
-  return (
+  return ( 
     <button
       type="button"
       onClick={onClick}
       disabled={disabled}
       style={{
-        display: 'flex',
+        display: 'inline-flex',
+        width: 'fit-content',
         height: '20px',
         padding: '6px 8px',
         justifyContent: 'center',
         alignItems: 'center',
         gap: '4px',
-        borderRadius: '12px',
-        background: 'var(--color-highlight)',
+        borderRadius: 'var(--radius-md)',
+        background: 'var(--Highlight-BackGround)',
         border: 'none',
         color: 'var(--neutral-light-lightest)',
         textAlign: 'center',
