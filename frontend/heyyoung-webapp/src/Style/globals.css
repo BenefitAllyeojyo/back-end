@@ -33,8 +33,6 @@ body {
   margin: 0;
   background: var(--color-bg);
   color: var(--color-text);
-  display: flex;
-  justify-content: center;
   font-family: 'OneShinhan', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
 }
 img,
@@ -55,9 +53,4 @@ video {
 }
 
 
-#app {
-  width: min(100vw, 375px);   /* 375 고정, 더 좁은 화면엔 맞춤 */
-  min-height: 100dvh;         /* 세로는 꽉 채우기 */
-  background: var(--color-surface);
-  box-shadow: 0 0 20px rgba(0,0,0,0.1); /* 카드 느낌 */
-}
+/* #app 스타일은 AppShell.jsx에서 직접 관리 */
