@@ -1,8 +1,8 @@
 import { useNavigate } from 'react-router-dom'
 import BackgroundImage from '../Components/atoms/BackgroundImage'
-import notificationImage from '../assets/images/pages/notification.png'
+import entireMenuImage from '../assets/images/pages/entire-menu.PNG'
 
-export default function NotificationPage() {
+export default function EntireMenuPage() {
   const navigate = useNavigate()
 
   const handleBackClick = () => {
@@ -11,10 +11,9 @@ export default function NotificationPage() {
 
   return (
     <BackgroundImage 
-      src={notificationImage}
-      alt="알림페이지 배경"
+      src={entireMenuImage}
+      alt="전체메뉴 배경"
     >
-      
       {/* 뒤로가기 버튼 영역 (투명 클릭 영역) */}
       <button
         onClick={handleBackClick}

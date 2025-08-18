@@ -9,6 +9,14 @@ export default function MainHomePage() {
     navigate('/notifications')
   }
 
+  const handleBenefitClick = () => {
+    navigate('/benefit-main')
+  }
+
+  const handleEntireMenuClick = () => {
+    navigate('/entire-menu')
+  }
+
   return (
     <div>
       {/* 테스트: 직접 img 태그로 확인 */}
@@ -23,6 +31,40 @@ export default function MainHomePage() {
           right: '20px',
           width: '44px',
           height: '44px',
+          border: 'none',
+          backgroundColor: 'transparent',
+          cursor: 'pointer'
+        }}
+      >
+        {/* 투명 클릭 영역 */}
+      </button>
+
+            {/* 혜택 버튼 영역 (하단 좌측) */}
+      <button
+        onClick={handleBenefitClick}
+        style={{
+          position: 'absolute',
+          bottom: '10px',
+          left: '150px',
+          width: '80px',
+          height: '60px',
+          border: 'none',
+          backgroundColor: 'transparent',
+          cursor: 'pointer'
+        }}
+      >
+        {/* 투명 클릭 영역 */}
+      </button>
+
+      {/* 전체메뉴 버튼 영역 (하단 우측) */}
+      <button
+        onClick={handleEntireMenuClick}
+        style={{
+          position: 'absolute',
+          bottom: '10px',
+          right: '30px',
+          width: '80px',
+          height: '60px',
           border: 'none',
           backgroundColor: 'transparent',
           cursor: 'pointer'
