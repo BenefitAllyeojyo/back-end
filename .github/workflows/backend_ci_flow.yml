@@ -33,18 +33,6 @@ jobs:
       - run: touch ./backend/core-bank/src/test/resources/application.yml
       - run: echo "${{ secrets.CORE_BANK_TEST_APPLICATION }}" > ./backend/core-bank/src/test/resources/application.yml
 
-      - name: Publish test results
-        uses: EnricoMi/publish-unit-test-result-action@v2
-        if: always()
-        with:
-          files: '**/build/test-results/test/TEST-*.xml'
-
-      - name: Publish test report
-        uses: mikepenz/action-junit-report@v4
-        if: always()
-        with:
-          report_paths: '**/build/test-results/test/TEST-*.xml'
-
       - name: Cache SonarQube packages
         uses: actions/cache@v4
         with:
@@ -65,3 +53,14 @@ jobs:
           cd backend
           ./gradlew build sonar --info
 
+      - name: Publish test results
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        if: always()
+        with:
+          files: '**/build/test-results/test/TEST-*.xml'
+
+      - name: Publish test report
+        uses: mikepenz/action-junit-report@v4
+        if: always()
+        with:
+          report_paths: '**/build/test-results/test/TEST-*.xml'
