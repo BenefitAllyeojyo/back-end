@@ -4,7 +4,7 @@ export default function AppShell({ children }) {
       <div
         id="app"
         style={{
-          width:'min(100vw,420px)', minWidth:320, margin:'0 auto',
+          width:'min(100vw,375px)', minWidth:320, margin:'0 auto',
           paddingInline:16, paddingBottom:'calc(16px + env(safe-area-inset-bottom))'
         }}
       >
