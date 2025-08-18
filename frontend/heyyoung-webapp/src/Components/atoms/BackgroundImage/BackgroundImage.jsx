@@ -24,9 +24,9 @@ export default function BackgroundImage({
           left: 0,
           width: '100%',
           height: '100%',
-          objectFit: 'contain',
+          objectFit: 'cover',
           objectPosition: 'center',
-          zIndex: -1
+          zIndex: 0
         }}
       />
       
@@ -40,7 +40,7 @@ export default function BackgroundImage({
             width: '100%',
             height: '100%',
             backgroundColor: `rgba(0, 0, 0, ${overlayOpacity})`,
-            zIndex: 0
+            zIndex: 1
           }}
         />
       )}
@@ -49,7 +49,7 @@ export default function BackgroundImage({
       <div 
         style={{
           position: 'relative',
-          zIndex: 1,
+          zIndex: 2,
           width: '100%',
           height: '100%'
         }}
