@@ -8,8 +8,9 @@ export default function BackgroundImage({
     <div 
       style={{
         position: 'relative',
-        width: '100%',
-        height: '100dvh',
+        width: '375px',
+        height: '812px',
+        margin: '0 auto',
         overflow: 'hidden'
       }}
     >
@@ -23,7 +24,8 @@ export default function BackgroundImage({
           left: 0,
           width: '100%',
           height: '100%',
-          objectFit: 'cover',
+          objectFit: 'contain',
+          objectPosition: 'center',
           zIndex: -1
         }}
       />
