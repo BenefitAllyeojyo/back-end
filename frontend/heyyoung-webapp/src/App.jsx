@@ -5,6 +5,7 @@ import NotificationPage from './Page/NotificationPage'
 import BenefitMainPage from './Page/BenefitMainPage'
 import EntireMenuPage from './Page/EntireMenuPage'
 import Payment from './Page/Payment'
+import ButtonExamplePage from './Page/ButtonExamplePage'
 import NotFound from './Page/NotFound'
 import './App.css'
 
@@ -18,6 +19,7 @@ function App() {
           <Route path="/benefit-main" element={<BenefitMainPage />} />
           <Route path="/entire-menu" element={<EntireMenuPage />} />
           <Route path="/pay" element={<Payment />} />
+          <Route path="/button-examples" element={<ButtonExamplePage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </AppShell>

@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 import BackgroundImage from '../Components/atoms/BackgroundImage'
+import BackgroundBottomTabImage from '../Components/atoms/BackgroundBottomTabImage'
 import entireMenuImage from '../assets/images/pages/entire-menu.PNG'
 
 export default function EntireMenuPage() {
@@ -10,26 +11,18 @@ export default function EntireMenuPage() {
   }
 
   return (
-    <BackgroundImage 
-      src={entireMenuImage}
-      alt="전체메뉴 배경"
-    >
-      {/* 뒤로가기 버튼 영역 (투명 클릭 영역) */}
-      <button
-        onClick={handleBackClick}
-        style={{
-          position: 'absolute',
-          top: '60px',
-          left: '20px',
-          width: '44px',
-          height: '44px',
-          border: 'none',
-          backgroundColor: 'transparent',
-          cursor: 'pointer'
-        }}
+    <div style={{ position: 'relative', height: '100%', overflow: 'auto' }}>
+      <BackgroundImage 
+        src={entireMenuImage}
+        alt="전체메뉴 배경"
       >
-        {/* 투명 클릭 영역 */}
-      </button>
-    </BackgroundImage>
+      </BackgroundImage>
+
+      {/* 하단 탭 이미지 - AppShell 컨테이너 하단에 고정 */}
+      <BackgroundBottomTabImage 
+        currentTab="menu"
+        position="absolute"
+      />
+    </div>
   )
 }

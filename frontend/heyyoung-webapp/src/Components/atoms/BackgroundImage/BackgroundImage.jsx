@@ -8,8 +8,7 @@ export default function BackgroundImage({
     <div 
       style={{
         position: 'relative',
-        width: '375px',
-        height: '812px',
+        width: '100%',           // 가로 100%
         margin: '0 auto',
         overflow: 'hidden'
       }}
@@ -19,36 +18,21 @@ export default function BackgroundImage({
         src={src}
         alt={alt}
         style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          width: '100%',
-          height: '100%',
-          objectFit: 'cover',
-          objectPosition: 'center',
+          width: '100%',           
+          height: 'auto',          
+          display: 'block',        
+          objectFit: 'cover',     
+          objectPosition: 'top center',
           zIndex: 0
         }}
       />
       
-      {/* 오버레이 (필요시) */}
-      {overlayOpacity > 0 && (
-        <div 
-          style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            width: '100%',
-            height: '100%',
-            backgroundColor: `rgba(0, 0, 0, ${overlayOpacity})`,
-            zIndex: 1
-          }}
-        />
-      )}
-      
-      {/* 컨텐츠 */}
+      {/* 컨텐츠는 absolute positioning */}
       <div 
         style={{
-          position: 'relative',
+          position: 'absolute',    // relative → absolute
+          top: 0,
+          left: 0,
           zIndex: 2,
           width: '100%',
           height: '100%'
