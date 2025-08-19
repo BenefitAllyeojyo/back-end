@@ -1,4 +1,4 @@
-export default function MiniPurpleBtn({
+export default function MiniBlueBtn({
   label, onClick, disabled = false
 }) {
   return (
@@ -7,16 +7,15 @@ export default function MiniPurpleBtn({
       onClick={onClick}
       disabled={disabled}
       style={{
-        display: 'flex',
+        display: 'inline-flex',
         width: 'auto',
         minWidth: '65px',
-        height: '35px',
         padding: '11px 5px',
         justifyContent: 'center',
         alignItems: 'center',
         gap: '10px',
-        borderRadius: '5px',
-        background: '#F0EFFE',
+        borderRadius: '10px',
+        background: 'var(--color-success-light)',
         border: 'none',
         color: 'var(--color-success-dark)',
         textAlign: 'center',

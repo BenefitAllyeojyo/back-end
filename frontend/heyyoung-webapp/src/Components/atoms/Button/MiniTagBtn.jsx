@@ -1,4 +1,4 @@
-export default function MiniPurpleBtn({
+export default function MiniTagBtn({
   label, onClick, disabled = false
 }) {
   return (
@@ -8,23 +8,22 @@ export default function MiniPurpleBtn({
       disabled={disabled}
       style={{
         display: 'flex',
-        width: 'auto',
-        minWidth: '65px',
-        height: '35px',
-        padding: '11px 5px',
+        height: '20px',
+        padding: '6px 8px',
         justifyContent: 'center',
         alignItems: 'center',
-        gap: '10px',
-        borderRadius: '5px',
-        background: '#F0EFFE',
+        gap: '4px',
+        borderRadius: '12px',
+        background: 'var(--color-highlight)',
         border: 'none',
-        color: 'var(--color-success-dark)',
+        color: 'var(--neutral-light-lightest)',
         textAlign: 'center',
-        fontSize: 'var(--font-size-s)',
+        fontSize: '8px',
         fontStyle: 'normal',
         fontWeight: 'var(--font-weight-body)',
-        lineHeight: '16px',
-        letterSpacing: '0.12px',
+        lineHeight: 'normal',
+        letterSpacing: '0.4px',
+        textTransform: 'uppercase',
         cursor: disabled ? 'default' : 'pointer',
         opacity: disabled ? 0.6 : 1
       }}

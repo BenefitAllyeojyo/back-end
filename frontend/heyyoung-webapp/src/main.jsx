@@ -6,6 +6,7 @@ import App from './App'
 import '@/Style/tokens.css'
 import '@/Style/globals.css'
 
+
 createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <Provider store={store}>
