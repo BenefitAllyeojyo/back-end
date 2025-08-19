@@ -1,3 +1,5 @@
+import styles from './RegularButton.module.css'
+
 export default function RegularButton({
   label, onClick, disabled = false
 }) {
@@ -6,26 +8,9 @@ export default function RegularButton({
       type="button"
       onClick={onClick}
       disabled={disabled}
-      style={{
-        display: 'flex',
-        height: '40px',
-        padding: '12px 16px',
-        justifyContent: 'center',
-        alignItems: 'center',
-        gap: '8px',
-        borderRadius: '12px',
-        border: '1.5px solid var(--color-highlight)',
-        background: 'transparent',
-        color: 'var(--color-highlight)',
-        fontSize: '12px',
-        fontStyle: 'normal',
-        fontWeight: 'var(--font-weight-action)',
-        lineHeight: 'normal',
-        cursor: disabled ? 'default' : 'pointer',
-        opacity: disabled ? 0.6 : 1
-      }}
+      className={styles.regularButton}
     >
-      <span className="truncate">{label}</span>
+      <span className={styles.label}>{label}</span>
     </button>
   )
 }

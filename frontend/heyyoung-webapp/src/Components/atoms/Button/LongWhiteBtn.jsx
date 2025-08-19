@@ -1,3 +1,5 @@
+import styles from './LongWhiteBtn.module.css'
+
 export default function LongWhiteBtn({
   label, onClick, disabled = false
 }) {
@@ -6,31 +8,9 @@ export default function LongWhiteBtn({
       type="button"
       onClick={onClick}
       disabled={disabled}
-      style={{
-        display: 'flex',
-        width: '311px',
-        padding: '16px',
-        alignItems: 'center',
-        gap: '16px',
-        borderRadius: '12px',
-        background: 'var(--neutral-light-lightest)',
-        border: 'none',
-        cursor: disabled ? 'default' : 'pointer',
-        opacity: disabled ? 0.6 : 1
-      }}
+      className={styles.longWhiteButton}
     >
-      <span 
-        style={{
-          alignSelf: 'stretch',
-          color: 'var(--neutral-dark-darkest)',
-          fontSize: 'var(--font-size-h4)',
-          fontStyle: 'normal',
-          fontWeight: 'var(--font-weight-heading)',
-          lineHeight: 'normal',
-          flex: 1,
-          textAlign: 'left'
-        }}
-      >
+      <span className={styles.label}>
         {label}
       </span>
       <svg 
@@ -39,11 +19,7 @@ export default function LongWhiteBtn({
         height="13" 
         viewBox="0 0 12 13" 
         fill="none"
-        style={{
-          width: '12px',
-          height: '12px',
-          flexShrink: 0
-        }}
+        className={styles.arrow}
       >
         <mask id="mask0_3817_3648" style={{maskType:'alpha'}} maskUnits="userSpaceOnUse" x="2" y="0" width="8" height="13">
           <path fillRule="evenodd" clipRule="evenodd" d="M2.72604 0.969661C2.42502 1.26254 2.42502 1.7374 2.72604 2.03028L7.31979 6.49978L2.72604 10.9693C2.42502 11.2622 2.42502 11.737 2.72604 12.0299C3.02707 12.3228 3.51512 12.3228 3.81615 12.0299L9.5 6.49978L3.81615 0.969661C3.51512 0.67678 3.02707 0.67678 2.72604 0.969661Z" fill="#542BA8"/>
