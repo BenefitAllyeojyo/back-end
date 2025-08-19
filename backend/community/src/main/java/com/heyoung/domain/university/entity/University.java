@@ -21,6 +21,7 @@ public class University extends BaseEntity {
     @Column(length = 200, nullable = false)
     private String name;
 
+	@Enumerated(EnumType.STRING)
     @Column(length = 50, nullable = false)
     private UniversityType type;
 
