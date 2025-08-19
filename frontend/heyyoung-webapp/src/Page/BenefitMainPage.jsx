@@ -11,7 +11,7 @@ export default function BenefitMainPage() {
   }
 
   return (
-    <div style={{ position: 'relative', height: '100%', overflow: 'auto' }}>
+    <div style={{ position: 'relative', height: '100%' }}>
       <BackgroundImage 
         src={benefitMainImage}
         alt="혜택 메인 배경"
@@ -34,10 +34,9 @@ export default function BenefitMainPage() {
         </button>
       </BackgroundImage>
 
-      {/* 하단 탭 이미지 - AppShell 컨테이너 하단에 고정 */}
+      {/* 하단 탭 이미지 - 이제 기본적으로 fixed */}
       <BackgroundBottomTabImage 
         currentTab="benefit"
-        position="absolute"
       />
     </div>
   )
