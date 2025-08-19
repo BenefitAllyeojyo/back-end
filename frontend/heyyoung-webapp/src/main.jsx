@@ -5,7 +5,6 @@ import store from '@/Store/store'
 import App from './App'
 import '@/Style/tokens.css'
 import '@/Style/globals.css'
-import App from '@/App'
 
 
 
