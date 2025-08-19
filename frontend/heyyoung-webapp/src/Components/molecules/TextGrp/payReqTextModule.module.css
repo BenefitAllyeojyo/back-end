@@ -1,0 +1,31 @@
+.payReqTextModule {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  width: fit-content;
+}
+
+.subTitle {
+  color: var(--support-success-dark);
+  font-size: var(--font-size-h5);
+  font-weight: var(--font-weight-heading);
+}
+
+.contentsContainer {
+  color: var(--neutral-dark-darkest);
+  font-size: var(--font-size-h5);
+  font-weight: var(--font-weight-heading);
+}
+
+.shopName{
+    color: var(--neutral-dark-darkest);
+    font-size: var(--font-size-h4);
+    font-weight: var(--font-weight-heading);
+}
+
+.money{
+    color: var(--neutral-dark-darkest);
+    font-size: var(--font-size-h2);
+    font-weight: var(--font-weight-heading);
+}
+
