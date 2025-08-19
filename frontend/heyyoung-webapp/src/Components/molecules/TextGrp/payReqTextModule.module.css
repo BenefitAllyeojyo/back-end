@@ -14,18 +14,20 @@
 .contentsContainer {
   color: var(--neutral-dark-darkest);
   font-size: var(--font-size-h5);
+  font-weight: var(--font-weight-body);
+  line-height: 1.5;
+}
+
+.shopName {
+  color: var(--neutral-dark-darkest);
+  font-size: var(--font-size-h4);
   font-weight: var(--font-weight-heading);
+  line-height: 1.7;
 }
 
-.shopName{
-    color: var(--neutral-dark-darkest);
-    font-size: var(--font-size-h4);
-    font-weight: var(--font-weight-heading);
+.money {
+  color: var(--neutral-dark-darkest);
+  font-size: var(--font-size-h3);
+  font-weight: var(--font-weight-heading);
+  line-height: 1.7;
 }
-
-.money{
-    color: var(--neutral-dark-darkest);
-    font-size: var(--font-size-h2);
-    font-weight: var(--font-weight-heading);
-}
-
