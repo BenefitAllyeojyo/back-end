@@ -41,39 +41,6 @@ export default function MainHomePage() {
           {/* 알림 버튼 클릭 영역 */}
         </button>
 
-        {/* 혜택 버튼 영역 (하단 좌측) */}
-        <button
-          onClick={handleBenefitClick}
-          style={{
-            position: 'absolute',
-            bottom: '10px',
-            left: '150px',
-            width: '80px',
-            height: '60px',
-            border: 'none',
-            backgroundColor: 'transparent',
-            cursor: 'pointer'
-          }}
-        >
-          {/* 혜택 버튼 클릭 영역 */}
-        </button>
-
-        {/* 전체메뉴 버튼 영역 (하단 우측) */}
-        <button
-          onClick={handleEntireMenuClick}
-          style={{
-            position: 'absolute',
-            bottom: '10px',
-            right: '30px',
-            width: '80px',
-            height: '60px',
-            border: 'none',
-            backgroundColor: 'transparent',
-            cursor: 'pointer'
-          }}
-        >
-          {/* 전체메뉴 버튼 클릭 영역 */}
-        </button>
       </div>
 
       {/* 하단 탭 이미지 - AppShell 컨테이너 하단에 고정 */}
