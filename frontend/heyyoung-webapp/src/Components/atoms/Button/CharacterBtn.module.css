@@ -1,0 +1,36 @@
+.characterButton {
+  width: 80px;
+  height: 80px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  border: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  font-size: 32px;
+  color: white;
+}
+
+.characterButton:not(:disabled) {
+  cursor: pointer;
+}
+
+.characterButton:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+
+.hasImage {
+  background-size: cover;
+  background-position: 50% 50%;
+  background-repeat: no-repeat;
+}
+
+.noImage {
+  background: var(--color-highlight);
+}
+
+.characterButton:active:not(:disabled) {
+  transform: scale(0.95);
+}
