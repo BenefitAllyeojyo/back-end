@@ -7,10 +7,7 @@
   --benefit: linear-gradient(180deg, #ddd7ff 0%, #f9e8da 100%);
 
   /* Highlight */
-  --Highlight-BackGround:
-    linear-gradient(0deg, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.2) 100%),
-    linear-gradient(0deg, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.2) 100%),
-    linear-gradient(0deg, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.2) 100%), #542ba8;
+  --Highlight-BackGround:#542ba8;
   --Highlight-Light: #7635fd;
   --Hightlight-Lightest: #deceff;
 
@@ -57,7 +54,17 @@
   --space-12: 12px;
   --space-16: 16px;
   --radius-lg: 16px;
+  --radius-md: 12px;
   --shadow-1: 0 1px 3px rgba(17, 24, 39, 0.08), 0 1px 2px rgba(17, 24, 39, 0.06);
+
+  /* ================= Button Tokens ================= */
+  --button-long-width: 311px;
+  --button-long-height: 48px;
+  --button-long-padding: 16px;
+  --button-long-gap: 16px;
+  --button-mini-height: 35px;
+  --button-mini-padding: 11px 5px;
+  --button-mini-gap: 10px;
 
   /* ================= Typography ================= */
   --font-sans: 'OneShinhan', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
