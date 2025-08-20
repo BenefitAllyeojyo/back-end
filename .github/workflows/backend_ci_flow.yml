@@ -35,9 +35,13 @@ jobs:
           java-version: 17
           distribution: 'zulu'
 
-      - name: Enable PostGIS extension
+      - name: Wait for PostgreSQL and enable PostGIS extension
         run: |
-          psql -h localhost -U myuser -d mygisdb -c "CREATE EXTENSION postgis;"
+          until pg_isready -h postgres -U myuser -d mygisdb; do
+            echo "Waiting for postgres to be ready..."
+            sleep 2
+          done
+          psql -h postgres -U myuser -d mygisdb -c "CREATE EXTENSION postgis;"
         env:
           PGPASSWORD: mypass
 
