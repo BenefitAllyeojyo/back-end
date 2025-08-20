@@ -46,10 +46,15 @@ jobs:
           touch ./backend/core-bank/src/test/resources/application.yml
           echo "${{ secrets.CORE_BANK_TEST_APPLICATION }}" > ./backend/core-bank/src/test/resources/application.yml
 
-      - name: Enable PostGIS extension
+      - name: Wait for PostgreSQL and enable PostGIS extension
+        run: |
+          until pg_isready -h postgres -U myuser -d mygisdb; do
+            echo "Waiting for postgres to be ready..."
+            sleep 2
+          done
+          psql -h postgres -U myuser -d mygisdb -c "CREATE EXTENSION IF NOT EXISTS postgis;"
         env:
           PGPASSWORD: mypass
-        run: psql -h postgres -U myuser -d mygisdb -c "CREATE EXTENSION IF NOT EXISTS postgis;"
 
       - name: Cache SonarQube packages
         uses: actions/cache@v4
