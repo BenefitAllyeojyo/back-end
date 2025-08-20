@@ -1,4 +1,4 @@
-INSERT INTO public.university (
+INSERT INTO university (
   id, name, type, campus_name, address, location, postal_code, main_phone,
   website, domain, access, "created_date", "updated_date"
 )
