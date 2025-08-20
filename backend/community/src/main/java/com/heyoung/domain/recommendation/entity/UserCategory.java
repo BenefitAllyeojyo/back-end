@@ -1,25 +1,28 @@
-package com.heyoung.domain.benefit.entity;
+package com.heyoung.domain.recommendation.entity;
 
+import com.heyoung.domain.benefit.entity.Category;
 import com.heyoung.global.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Entity @Getter
+/**
+ * 유저가 많이 사용한 카테고리 카운트.
+ */
+@Entity
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Similarity extends BaseEntity {
+public class UserCategory extends BaseEntity {
+
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false)
-    private Double score;
+    private Long userId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
-
-    private Long userId;
-
 
 }
