@@ -11,6 +11,15 @@ jobs:
   build:
     name: build and test
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgis/postgis:17-3.5
+        env:
+          POSTGRES_USER: myuser
+          POSTGRES_PASSWORD: mypass
+          POSTGRES_DB: mygisdb
+        options: >-
+          --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
     permissions:
       contents: read
       checks: write
@@ -26,6 +35,21 @@ jobs:
           java-version: 17
           distribution: 'zulu'
 
+
+      - name: Wait for PostgreSQL to be ready
+        run: |
+          until pg_isready -h localhost -U myuser -d mygisdb; do
+            echo "Waiting for postgres to be ready..."
+            sleep 2
+          done
+        env:
+          PGPASSWORD: mypass
+
+      - name: Enable PostGIS extension
+        run: |
+          psql -h localhost -U myuser -d mygisdb -c "CREATE EXTENSION postgis;"
+        env:
+          PGPASSWORD: mypass
 
       - uses: actions/checkout@v3
       - run: touch ./backend/community/src/test/resources/application.yml
