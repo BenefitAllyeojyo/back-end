@@ -35,16 +35,6 @@ jobs:
           java-version: 17
           distribution: 'zulu'
 
-
-      - name: Wait for PostgreSQL to be ready
-        run: |
-          until pg_isready -h localhost -U myuser -d mygisdb; do
-            echo "Waiting for postgres to be ready..."
-            sleep 2
-          done
-        env:
-          PGPASSWORD: mypass
-
       - name: Enable PostGIS extension
         run: |
           psql -h localhost -U myuser -d mygisdb -c "CREATE EXTENSION postgis;"
