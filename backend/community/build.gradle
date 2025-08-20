@@ -29,7 +29,9 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     testImplementation("org.springframework.boot:spring-boot-starter-test")
-}
+
+    //postgresql
+    runtimeOnly 'org.postgresql:postgresql'}
 
 test {
     useJUnitPlatform()
