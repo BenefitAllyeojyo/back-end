@@ -1,6 +1,5 @@
 package com.heyoung.domain.university.entity;
 
-import com.heyoung.domain.benefit.entity.Partnership;
 import com.heyoung.global.entity.BaseEntity;
 import com.heyoung.global.enums.UniversityAccess;
 import com.heyoung.global.enums.UniversityType;
@@ -21,7 +20,6 @@ public class University extends BaseEntity {
     @Column(length = 200, nullable = false)
     private String name;
 
-	@Enumerated(EnumType.STRING)
     @Column(length = 50, nullable = false)
     private UniversityType type;
 

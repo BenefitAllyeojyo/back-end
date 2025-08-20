@@ -21,7 +21,7 @@ public class Timetable extends BaseEntity {
     private String semester;
 
     @Column(nullable = false)
-    private Integer years;
+    private Integer year;
 
     @Column(length = 20, nullable = false)
     private String courseCode;
