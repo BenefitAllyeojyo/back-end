@@ -52,14 +52,13 @@ public class PushToken extends BaseEntity {
     @Column(nullable = false)
     private int failCount = 0; // default 값 0
 
-    @Column(nullable = false)
+    @Column
     @Enumerated(value = EnumType.STRING)
     private InvalidType invalidType;
 
-    @Column(nullable = false)
+    @Column
     private LocalDateTime lastSeenAt; // 앱이 마지막으로 토큰을 보고한 시각
-
-    @Column(nullable = false)
+    @Column
     private LocalDateTime lastSentAt; // 우리가 마지막으로 발송 시도한 시각
 
     @Column(length = 32)
