@@ -1,13 +1,12 @@
-import './MessageBubble.css'
+import styles from './MessageBubble.module.css'
 
 export default function MessageBubble({
     text,
-    type = 'user'
   }) {
 
                 
     return (
-      <div className={`message-bubble ${type}`}>
+      <div className={`${styles.messageBubble}`}>
             {text}
       </div>
     )

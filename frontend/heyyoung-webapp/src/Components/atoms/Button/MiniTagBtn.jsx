@@ -1,4 +1,4 @@
-import styles from './MiniTagBtn.module.css'
+import styles from './MiniTagBtn.module.css';
 
 export default function MiniTagBtn({
   label, onClick, disabled = false
@@ -8,7 +8,11 @@ export default function MiniTagBtn({
       type="button"
       onClick={onClick}
       disabled={disabled}
-      className={styles.miniTagButton}
+      className={styles.MiniTagBtn}
+      style={{
+        cursor: disabled ? 'default' : 'pointer',
+        opacity: disabled ? 0.6 : 1
+      }}
     >
       <span className={styles.label}>{label}</span>
     </button>
