@@ -1,6 +1,7 @@
 import Button from '@/Components/atoms/Button/Button'
 import CharacterBtn from '@/Components/atoms/Button/CharacterBtn'
 import LongVioletBtn from '@/Components/atoms/Button/LongVioletBtn'
+import LongBlueBtn from '@/Components/atoms/Button/LongBlueBtn'
 import BigCardBtn from '@/Components/atoms/Button/BigCardBtn'
 import LongPurpleBtn from '@/Components/atoms/Button/LongPurpleBtn'
 import LongWhiteBtn from '@/Components/atoms/Button/LongWhiteBtn'
@@ -11,11 +12,31 @@ import MiniTagBtn from '@/Components/atoms/Button/MiniTagBtn'
 import RegularButton from '@/Components/atoms/Button/RegularButton'
 import SearchBtn from '@/Components/atoms/Button/SearchBtn'
 import SquareWhiteBtn from '@/Components/atoms/Button/SquareWhiteBtn'
+import { Carousel } from '@/Components/molecules/Carousel'
 
 export default function ButtonExamplePage() {
   const handleClick = (buttonName) => {
     console.log(`${buttonName} 클릭됨!`)
   }
+
+  // 카루셀 테스트용 데이터
+  const carouselSlides = [
+    {
+      image: '/src/assets/images/pages/benefit-main.PNG',
+      title: '점심값 결제했다면?',
+      subtitle: '지금 50% 돌려받으세요'
+    },
+    {
+      image: '/src/assets/images/pages/main-home.png',
+      title: '새로운 혜택',
+      subtitle: '특별한 할인을 만나보세요'
+    },
+    {
+      image: '/src/assets/images/card.png',
+      title: '카드 혜택',
+      subtitle: '다양한 카드 혜택을 확인하세요'
+    }
+  ]
 
   return (
     <div style={{ 
@@ -23,7 +44,8 @@ export default function ButtonExamplePage() {
       maxWidth: '800px', 
       margin: '0 auto',
       background: 'var(--neutral-light-lightest)',
-      minHeight: '100vh'
+      minHeight: '100vh',
+      overflowY: 'auto'  // 세로 스크롤 추가
     }}>
       <h1 style={{ 
         color: 'var(--neutral-dark-darkest)', 
@@ -110,6 +132,10 @@ export default function ButtonExamplePage() {
             label="Long Violet Button" 
             onClick={() => handleClick('Long Violet')} 
           />
+          <LongBlueBtn 
+            label="Long Blue Button" 
+            onClick={() => handleClick('Long Blue')} 
+          />
           <LongPurpleBtn 
             label="Long Purple Button" 
             onClick={() => handleClick('Long Purple')} 
@@ -187,6 +213,16 @@ export default function ButtonExamplePage() {
             label="Square White Button" 
             onClick={() => handleClick('Square White')} 
           />
+        </div>
+      </section>
+
+      {/* Carousel Component */}
+      <section style={{ marginBottom: '40px' }}>
+        <h2 style={{ color: 'var(--neutral-dark-darkest)', marginBottom: '20px' }}>
+          카루셀 컴포넌트 (Carousel)
+        </h2>
+        <div style={{ display: 'flex', justifyContent: 'center' }}>
+          <Carousel slides={carouselSlides} />
         </div>
       </section>
 
