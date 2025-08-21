@@ -111,12 +111,6 @@ export default function Carousel({ slides = [] }) {
                   <h3 className={styles.title}>{slide.title}</h3>
                   <p className={styles.subtitle}>{slide.subtitle}</p>
                 </div>
-                <div className={styles.buttonContainer}>
-                  <LongBlueBtn
-                    label="자세히 보기"
-                    onClick={() => handleDetailClick(slide)}
-                  />
-                </div>
               </div>
             </div>
           ))}
