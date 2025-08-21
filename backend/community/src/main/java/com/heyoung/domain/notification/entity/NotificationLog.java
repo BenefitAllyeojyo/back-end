@@ -14,14 +14,13 @@ import java.time.Instant;
  */
 
 @Table(
-        name = "notification_event",
+        name = "notification_log",
         uniqueConstraints = {
-                @UniqueConstraint(name = "uq_notification_event_uniq_key", columnNames = "uniqKey")
+                @UniqueConstraint(name = "uq_notification_event_uniq_key", columnNames = "uniq_key")
         },
         indexes = {
-                @Index(name = "idx_ne_notif_time", columnList = "notification_id, occurredAt DESC"),
-                @Index(name = "idx_ne_user_event_time", columnList = "userId, notificationType, occurredAt DESC"),
-                @Index(name = "idx_ne_event_time", columnList = "notificationType, occurredAt DESC")
+                @Index(name = "idx_ne_notif_time",      columnList = "notification_id, occurred_at"),
+                @Index(name = "idx_ne_user_notif_time", columnList = "user_id, notification_id, occurred_at")
         }
 )
 @Entity
