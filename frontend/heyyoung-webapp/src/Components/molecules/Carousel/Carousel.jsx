@@ -1,5 +1,4 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { LongBlueBtn } from '../../atoms/Button';
 import styles from './Carousel.module.css';
 
 export default function Carousel({ slides = [] }) {
@@ -21,10 +20,7 @@ export default function Carousel({ slides = [] }) {
     setCurrentSlide(index);
   };
 
-  const handleDetailClick = (slide) => {
-    // TODO: 리다이렉팅 로직 추가 예정
-    console.log('자세히 보기 클릭:', slide);
-  };
+
 
   // 터치/마우스 이벤트 핸들러
   const handleTouchStart = (e) => {

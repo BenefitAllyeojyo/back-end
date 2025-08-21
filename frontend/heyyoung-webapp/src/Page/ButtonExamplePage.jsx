@@ -1,7 +1,6 @@
 import Button from '@/Components/atoms/Button/Button'
 import CharacterBtn from '@/Components/atoms/Button/CharacterBtn'
 import LongVioletBtn from '@/Components/atoms/Button/LongVioletBtn'
-import LongBlueBtn from '@/Components/atoms/Button/LongBlueBtn'
 import BigCardBtn from '@/Components/atoms/Button/BigCardBtn'
 import LongPurpleBtn from '@/Components/atoms/Button/LongPurpleBtn'
 import LongWhiteBtn from '@/Components/atoms/Button/LongWhiteBtn'
@@ -131,10 +130,6 @@ export default function ButtonExamplePage() {
           <LongVioletBtn 
             label="Long Violet Button" 
             onClick={() => handleClick('Long Violet')} 
-          />
-          <LongBlueBtn 
-            label="Long Blue Button" 
-            onClick={() => handleClick('Long Blue')} 
           />
           <LongPurpleBtn 
             label="Long Purple Button" 
