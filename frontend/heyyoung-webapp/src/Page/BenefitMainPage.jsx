@@ -2,13 +2,21 @@ import { useNavigate } from 'react-router-dom'
 import BackgroundImage from '../Components/atoms/BackgroundImage'
 import BackgroundBottomTabImage from '../Components/atoms/BackgroundBottomTabImage'
 import benefitMainImage from '../assets/images/pages/benefit-main.PNG'
+import { Carousel } from '@/Components/molecules/Carousel'
 
 export default function BenefitMainPage() {
-  const navigate = useNavigate()
-
-  const handleBackClick = () => {
-    navigate('/')
-  }
+  // 카루셀 데이터
+  const carouselSlides = [
+    {
+      image: '/src/assets/images/carousel/carousel1.PNG',
+    },
+    {
+      image: '/src/assets/images/carousel/carousel2.png',
+    },
+    {
+      image: '/src/assets/images/carousel/carousel3.png',
+    }
+  ]
 
   return (
     <div style={{ position: 'relative', height: '100%' }}>
@@ -16,23 +24,20 @@ export default function BenefitMainPage() {
         src={benefitMainImage}
         alt="혜택 메인 배경"
       >
-        {/* 뒤로가기 버튼 영역 (투명 클릭 영역) */}
-        <button
-          onClick={handleBackClick}
-          style={{
-            position: 'absolute',
-            top: '60px',
-            left: '20px',
-            width: '44px',
-            height: '44px',
-            border: 'none',
-            backgroundColor: 'transparent',
-            cursor: 'pointer'
-          }}
-        >
-          {/* 투명 클릭 영역 */}
-        </button>
       </BackgroundImage>
+
+
+      {/* 카루셀 컴포넌트 추가 */}
+      <div style={{ 
+        position: 'absolute', 
+        top: '37%', 
+        left: '50%', 
+        transform: 'translate(-50%, -50%)',
+        width: '100%',
+        zIndex: 10
+      }}>
+        <Carousel slides={carouselSlides} />
+      </div>  
 
       {/* 하단 탭 이미지 - 이제 기본적으로 fixed */}
       <BackgroundBottomTabImage 
