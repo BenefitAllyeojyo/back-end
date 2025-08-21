@@ -1,0 +1,12 @@
+plugins {
+	id 'java'
+}
+
+group = 'com.heyung'
+version = '0.0.1-SNAPSHOT'
+description = '혜택을 알려줘 백엔드 리파지토리입니다.'
+
+
+repositories {
+	mavenCentral()
+}
