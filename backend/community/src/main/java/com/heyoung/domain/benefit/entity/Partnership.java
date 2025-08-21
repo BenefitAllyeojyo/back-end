@@ -9,6 +9,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -42,5 +44,8 @@ public class Partnership extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "university_id", nullable = false)
     private University university;
+
+    @OneToMany(mappedBy = "partnership", fetch = FetchType.LAZY) // 이미지 조회를 위한 양방향 매핑
+    private List<PartnershipImage> partnershipImages = new ArrayList<>();
 
 }
