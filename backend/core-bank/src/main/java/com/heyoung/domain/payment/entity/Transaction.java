@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.BatchSize;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.time.LocalDateTime;
 
 @Entity @Getter
@@ -23,7 +24,7 @@ public class Transaction {
     private Long partnershipId;
 
     @Column(nullable = false)
-    private LocalDateTime transactionDateTime;
+    private Instant transactionDateTime;
 
     @Column(precision = 15, scale = 2, nullable = false)
     private BigDecimal amount;

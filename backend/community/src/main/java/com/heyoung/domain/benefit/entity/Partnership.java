@@ -2,7 +2,6 @@ package com.heyoung.domain.benefit.entity;
 
 import com.heyoung.domain.university.entity.University;
 import com.heyoung.global.entity.BaseEntity;
-import com.heyoung.global.enums.PartnershipCategory;
 import com.heyoung.global.enums.PartnershipStatus;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -20,9 +19,9 @@ public class Partnership extends BaseEntity {
     @Column(length = 100, nullable = false)
     private String companyName;
 
-    @Enumerated(EnumType.STRING)
-    @Column(length = 20, nullable = false)
-    private PartnershipCategory category;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id", nullable = false)
+    private Category category;
 
     @Column(precision = 5, scale = 2, nullable = false)
     private BigDecimal discountRate;

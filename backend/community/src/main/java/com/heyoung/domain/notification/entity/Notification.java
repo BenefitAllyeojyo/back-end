@@ -9,6 +9,9 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+/**
+ * 알림 예약 저장소. 이 DB 의 send_at 을 조회하여 알림을 발송시키는 것.
+ */
 @Entity @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Notification extends BaseEntity {
