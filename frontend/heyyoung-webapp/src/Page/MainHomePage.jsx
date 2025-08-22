@@ -11,14 +11,6 @@ export default function MainHomePage() {
     navigate('/notifications')
   }
 
-  const handleBenefitClick = () => {
-    navigate('/benefit-main')
-  }
-
-  const handleEntireMenuClick = () => {
-    navigate('/entire-menu')
-  }
-
   const handleBannerClick = () => {
     console.log('메인 배너 클릭됨!')
     // 배너 클릭 시 동작 로직 (특별 페이지 이동 등)
