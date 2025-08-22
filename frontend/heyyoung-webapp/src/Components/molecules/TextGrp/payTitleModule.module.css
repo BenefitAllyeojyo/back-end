@@ -13,7 +13,7 @@
 }
 
 .title {
-  color: var(--Neutral-Dark-Darkest, #1b1546);
+  color: var(--neutral-dark-darkest);
 
   /* Heading/H3 */
   font-size: var(--font-size-h3);

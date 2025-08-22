@@ -13,7 +13,7 @@
 }
 
 .ToolTipModuleTitle {
-    color: var(--Neutral-Light-Lightest, #FFF);
+    color: var(--neutral-light-lightest);
 
     /* Heading/H5 */
     font-size: var(--font-size-h5);
