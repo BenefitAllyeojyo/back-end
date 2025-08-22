@@ -13,10 +13,12 @@ import lombok.RequiredArgsConstructor;
 public class WebConfig implements WebMvcConfigurer {
 
 	private final MemberIdArgumentResolver memberIdArgumentResolver;
+	private final ManagerIdArgumentResolver managerIdArgumentResolver;
 
 	@Override
 	public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
 		resolvers.add(memberIdArgumentResolver);
+		resolvers.add(managerIdArgumentResolver);
 	}
 
 }
