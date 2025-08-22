@@ -16,11 +16,6 @@ public class PartnershipController {
         this.partnershipService = partnershipService;
     }
 
-    @GetMapping
-    public List<PartnershipDto> getAllPartnerships() {
-        return partnershipService.findAllPartnerships();
-    }
-
     @GetMapping("/university/{universityId}")
     public List<PartnershipDto> getPartnershipsByUniversityId(@PathVariable Long universityId) {
         return partnershipService.findPartnershipsByUniversityId(universityId);
