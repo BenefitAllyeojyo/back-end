@@ -2,14 +2,11 @@ import { useNavigate } from 'react-router-dom'
 import BackgroundImage from '../Components/atoms/BackgroundImage'
 import BackgroundBottomTabImage from '../Components/atoms/BackgroundBottomTabImage'
 import Banner from '../Components/atoms/Banner'
+import { BellButton } from '../Components/atoms/Button'
 import mainHomeImage from '../assets/images/pages/main-home.png'
 
 export default function MainHomePage() {
   const navigate = useNavigate()
-
-  const handleNotificationClick = () => {
-    navigate('/notifications')
-  }
 
   const handleBannerClick = () => {
     console.log('메인 배너 클릭됨!')
@@ -23,21 +20,16 @@ export default function MainHomePage() {
         <img src={mainHomeImage} alt="메인홈" style={{ display:'block', width:'100%', height: 'auto' }} />
         
         {/* 메인 이미지 위의 버튼들 */}
-        <button
-          onClick={handleNotificationClick}
+        <div
           style={{
             position: 'absolute',
-            top: '60px',
+            top: '57px',
             right: '20px',
-            width: '44px',
-            height: '44px',
-            border: 'none',
-            backgroundColor: 'transparent',
-            cursor: 'pointer'
+            zIndex: 10
           }}
         >
-          {/* 알림 버튼 클릭 영역 */}
-        </button>
+          <BellButton />
+        </div>
 
 
         {/* 메인 이미지 위에 오버레이 배너 */}
