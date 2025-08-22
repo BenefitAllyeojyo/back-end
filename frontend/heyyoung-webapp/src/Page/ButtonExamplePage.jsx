@@ -21,19 +21,13 @@ export default function ButtonExamplePage() {
   // 카루셀 테스트용 데이터
   const carouselSlides = [
     {
-      image: '/src/assets/images/pages/benefit-main.PNG',
-      title: '점심값 결제했다면?',
-      subtitle: '지금 50% 돌려받으세요'
+      image: '/src/assets/images/carousel/carousel1.png',
     },
     {
-      image: '/src/assets/images/pages/main-home.png',
-      title: '새로운 혜택',
-      subtitle: '특별한 할인을 만나보세요'
+      image: '/src/assets/images/carousel/carousel2.png',
     },
     {
-      image: '/src/assets/images/card.png',
-      title: '카드 혜택',
-      subtitle: '다양한 카드 혜택을 확인하세요'
+      image: '/src/assets/images/carousel/carousel3.png',
     }
   ]
 
@@ -53,6 +47,16 @@ export default function ButtonExamplePage() {
       }}>
         버튼 컴포넌트 예제
       </h1>
+
+      {/* Carousel Component */}
+      <section style={{ marginBottom: '40px' }}>
+        <h2 style={{ color: 'var(--neutral-dark-darkest)', marginBottom: '20px' }}>
+          카루셀 컴포넌트 (Carousel)
+        </h2>
+        <div style={{ display: 'flex', justifyContent: 'center' }}>
+          <Carousel slides={carouselSlides} />
+        </div>
+      </section>
 
       {/* Basic Button */}
       <section style={{ marginBottom: '40px' }}>
@@ -208,16 +212,6 @@ export default function ButtonExamplePage() {
             label="Square White Button" 
             onClick={() => handleClick('Square White')} 
           />
-        </div>
-      </section>
-
-      {/* Carousel Component */}
-      <section style={{ marginBottom: '40px' }}>
-        <h2 style={{ color: 'var(--neutral-dark-darkest)', marginBottom: '20px' }}>
-          카루셀 컴포넌트 (Carousel)
-        </h2>
-        <div style={{ display: 'flex', justifyContent: 'center' }}>
-          <Carousel slides={carouselSlides} />
         </div>
       </section>
 
