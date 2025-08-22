@@ -42,3 +42,5 @@ community/src/main/resources/application-test.yml
 
 core-bank/src/main/resources/application.yml
 core-bank/src/main/resources/application-test.yml
+
+/**/application*
