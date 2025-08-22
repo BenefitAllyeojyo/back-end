@@ -1,9 +1,10 @@
 export default function Banner({
   title = "배너 제목",
   subtitle = "배너 부제목",
-  width = "327px",
-  height = "120px",
+  width = "200px",
+  height = "200px",
   backgroundColor = "rgba(128, 128, 128, 0.3)", // 투명한 회색
+  background, // gradient 배경을 위한 prop
   borderRadius = "16px",
   onClick,
   style = {}
@@ -14,7 +15,7 @@ export default function Banner({
       style={{
         width,
         height,
-        backgroundColor,
+        background: background || backgroundColor, // background가 있으면 사용, 없으면 backgroundColor 사용
         borderRadius,
         display: 'flex',
         flexDirection: 'column',
