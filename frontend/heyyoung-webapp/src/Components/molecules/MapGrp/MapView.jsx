@@ -2,63 +2,15 @@ import React, { useEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import styles from './MapView.module.css';
 import ToolTipModule from '../../molecules/TextGrp/ToolTipModule';
+import { mapMarkers, mapCenter, mapConfig } from '../../../../public/mock/mapMarkers';
 
-const MapView = () => {
+const MapView = ({schoolName, schoolColor}) => {
   const mapRef = useRef(null);
   const mapInstanceRef = useRef(null);
   const [mapLoaded, setMapLoaded] = useState(false);
 
-  // 성신여대 근처 가게 데이터
-  const testMarkers = [
-    {
-      id: 1,
-      lat: 37.5925,
-      lng: 127.0163,
-      name: '성신여자대학교',
-      content: '🏫 학생증 제시 시 10% 할인\n📚 교재 구매 시 5% 추가 할인\n🎓 졸업생 할인 혜택 제공',
-      isSchool: true
-    },
-    {
-      id: 2,
-      lat: 37.5928,
-      lng: 127.0168,
-      name: '스타벅스 성신여대점',
-      content: '☕ 학생증 제시 시 음료 10% 할인\n🍰 케이크 구매 시 음료 무료 업그레이드\n📱 모바일 주문 시 포인트 2배 적립',
-      isSchool: false
-    },
-    {
-      id: 3,
-      lat: 37.5922,
-      lng: 127.0158,
-      name: '맥도날드 성신여대점',
-      content: '🍔 학생증 제시 시 세트메뉴 15% 할인\n🍟 사이드 메뉴 무료 업그레이드\n🎫 생일자 할인 쿠폰 제공',
-      isSchool: false
-    },
-    {
-      id: 4,
-      lat: 37.5930,
-      lng: 127.0170,
-      name: '올리브영 성신여대점',
-      content: '💄 학생증 제시 시 전체 상품 20% 할인\n🧴 화장품 샘플 무료 증정\n🎁 3만원 이상 구매 시 선물세트 증정',
-      isSchool: false
-    },
-    {
-      id: 5,
-      lat: 37.5920,
-      lng: 127.0160,
-      name: 'GS25 성신여대점',
-      content: '🏪 학생증 제시 시 즉석식품 30% 할인\n🥤 음료 2+1 이벤트\n📱 모바일 결제 시 포인트 3배 적립',
-      isSchool: false
-    },
-    {
-      id: 6,
-      lat: 37.5932,
-      lng: 127.0172,
-      name: '교보문고 성신여대점',
-      content: '📚 학생증 제시 시 교재 25% 할인\n📖 일반 도서 15% 할인\n🎓 졸업생 할인 혜택 추가 제공',
-      isSchool: false
-    }
-  ];
+  // mock 데이터에서 가게 정보 가져오기
+  const testMarkers = mapMarkers;
 
   useEffect(() => {
     // 카카오지도 API가 로드되었는지 확인
@@ -86,8 +38,8 @@ const MapView = () => {
       
       // 지도를 생성할 때 필요한 기본 옵션 (성신여대 중심)
       var mapOption = {
-        center: new kakao.maps.LatLng(37.5925, 127.0163), // 지도의 중심좌표 (성신여대)
-        level: 3 // 지도의 확대 레벨
+        center: new kakao.maps.LatLng(mapCenter.lat, mapCenter.lng), // 지도의 중심좌표 (성신여대)
+        level: mapConfig.level // 지도의 확대 레벨
       };
 
       // 지도를 생성 및 객체 리턴
@@ -133,20 +85,99 @@ const MapView = () => {
       console.log('지도 중심 변경됨');
       updateTooltipSizes(map);
     });
+
+    // 지도 로드 완료 이벤트
+    kakao.maps.event.addListener(map, 'tilesloaded', () => {
+      console.log('지도 타일 로드 완료');
+      updateTooltipSizes(map);
+    });
+
+    // 지도 클릭 이벤트 (테스트용)
+    kakao.maps.event.addListener(map, 'click', () => {
+      console.log('지도 클릭됨');
+      // 클릭 시 현재 레벨과 크기 정보 표시
+      const currentLevel = map.getLevel();
+      console.log(`현재 지도 레벨: ${currentLevel}`);
+    });
   };
 
   const updateTooltipSizes = (map) => {
     const currentLevel = map.getLevel();
-    const zoomFactor = Math.max(0.5, Math.min(2.0, currentLevel / 3)); // 레벨 3을 기준으로 크기 조절
     
-    // 모든 tooltip의 크기를 조절
+    // 지도 레벨에 따른 크기 조절 로직 (레벨 1-14)
+    // 레벨 1(가장 확대) → 마커 작게, 레벨 14(가장 축소) → 마커 크게
+    let scaleFactor;
+    let fontSize;
+
+    if (currentLevel >= 12) {
+      scaleFactor = 0.4;
+      fontSize = '10px';
+    } else if (currentLevel >= 10) {
+      scaleFactor = 0.5;
+      fontSize = '11px';
+    } else if (currentLevel >= 8) {
+      scaleFactor = 0.6;
+      fontSize = '12px';
+    } else if (currentLevel >= 6) {
+      scaleFactor = 0.7;
+      fontSize = '13px';
+    } else if (currentLevel >= 4) {
+      scaleFactor = 0.8;
+      fontSize = '14px';
+    } else if (currentLevel >= 2) {
+      scaleFactor = 0.9;
+      fontSize = '15px';
+    } else {
+      scaleFactor = 1.0;
+      fontSize = '16px';
+    }
+
+    // if (currentLevel <= 2) {
+    //   scaleFactor = 0.4;
+    //   fontSize = '10px';
+    // } else if (currentLevel <= 4) {
+    //   scaleFactor = 0.6;
+    //   fontSize = '11px';
+    // } else if (currentLevel <= 6) {
+    //   scaleFactor = 0.8;
+    //   fontSize = '12px';
+    // } else if (currentLevel <= 8) {
+    //   scaleFactor = 1.0;
+    //   fontSize = '13px';
+    // } else if (currentLevel <= 10) {
+    //   scaleFactor = 1.3;
+    //   fontSize = '14px';
+    // } else if (currentLevel <= 12) {
+    //   scaleFactor = 1.6;
+    //   fontSize = '15px';
+    // } else {
+    //   scaleFactor = 2.0;
+    //   fontSize = '16px';
+    // }
+    
+    // 모든 tooltip의 크기와 글자 크기를 조절
     const tooltips = document.querySelectorAll(`.${styles.tooltipOverlay}`);
     tooltips.forEach((tooltip) => {
-      tooltip.style.transform = `scale(${zoomFactor})`;
+      tooltip.style.transform = `scale(${scaleFactor})`;
       tooltip.style.transformOrigin = 'bottom center';
+      tooltip.style.transition = 'transform 0.3s ease-in-out';
+      
+      // 글자 크기도 조절
+      const titleElements = tooltip.querySelectorAll('.ToolTipModuleTitle');
+      const contentElements = tooltip.querySelectorAll('.ToolTipModuleContent');
+      
+      titleElements.forEach((title) => {
+        title.style.fontSize = fontSize;
+        title.style.transition = 'font-size 0.3s ease-in-out';
+      });
+      
+      contentElements.forEach((content) => {
+        content.style.fontSize = `calc(${fontSize} - 2px)`;
+        content.style.transition = 'font-size 0.3s ease-in-out';
+      });
     });
     
-    console.log(`지도 레벨: ${currentLevel}, 툴팁 크기: ${zoomFactor}`);
+    console.log(`지도 레벨: ${currentLevel}, 툴팁 크기: ${scaleFactor.toFixed(2)}, 글자 크기: ${fontSize}`);
   };
 
   const addTooltipOverlay = (map, markerData) => {
@@ -204,14 +235,14 @@ const MapView = () => {
         ref={mapRef}
         id="map"
         className={styles.map}
-        style={{ width: '600px', height: '500px' }}
+        style={{ width: `${mapConfig.width}px`, height: `${mapConfig.height}px` }}
       />
       
       {/* 지도 위에 추가 정보 표시 */}
       {mapLoaded && (
         <div className={styles.mapInfo}>
-          <h3>🏫 성신여자대학교 주변 지도</h3>
-          <p>성신여대 주변의 다양한 가게들과 편의시설을 확인할 수 있습니다!</p>
+          <h3>🏫 {schoolName} 주변 지도</h3>
+          <p>{schoolName} 주변의 다양한 가게들과 편의시설을 확인할 수 있습니다!</p>
           
           {/* 위치 목록 표시 */}
           <div className={styles.locationList}>
