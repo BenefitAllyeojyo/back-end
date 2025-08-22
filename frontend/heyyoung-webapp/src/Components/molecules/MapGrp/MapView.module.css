@@ -111,6 +111,28 @@
   pointer-events: auto;
   transition: transform 0.3s ease-in-out;
   will-change: transform;
+  cursor: pointer;
+}
+
+.tooltipOverlay:hover {
+  transform: scale(1.05);
+  transition: transform 0.2s ease-in-out;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.tooltipOverlay:active {
+  transform: scale(0.95);
+  transition: transform 0.1s ease-in-out;
+}
+
+.tooltipOverlay.clicked {
+  animation: clickEffect 0.3s ease-in-out;
+}
+
+@keyframes clickEffect {
+  0% { transform: scale(1); }
+  50% { transform: scale(0.9); }
+  100% { transform: scale(1); }
 }
 
 .tooltipOverlay * {

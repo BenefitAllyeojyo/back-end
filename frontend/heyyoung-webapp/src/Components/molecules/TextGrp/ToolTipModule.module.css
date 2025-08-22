@@ -1,7 +1,7 @@
 .ToolContainer {
   display: flex;
   width: fit-content;
-  max-width: 250px;
+  width: 250px;
   padding: 20px;
   flex-direction: column;
   align-items: flex-start;
@@ -9,26 +9,36 @@
   align-self: stretch;
   border-radius: 16px;
   background: var(--neutral-dark-dark);
-
+  overflow: hidden;
 }
 
 .ToolTipModuleTitle {
+    width: fit-content;
+    max-width: 250px;
     color: var(--Neutral-Light-Lightest, #FFF);
 
     /* Heading/H5 */
     font-size: var(--font-size-h5);
     font-weight: var(--font-weight-heading);
+    word-wrap: break-word;
+    word-break: break-all;
+    overflow-wrap: break-word;
+    white-space: pre-wrap;
+    line-height: 1.3;
 }
 
 .ToolTipModuleContent {
+    width: fit-content;
+    max-width: 250px;
     color: var(--neutral-light-dark);
     font-size: var(--font-size-s);
     font-weight: var(--font-weight-body);
     letter-spacing: 0.15px;
     word-wrap: break-word;
-    word-break: keep-all;
-    overflow-wrap: anywhere;
-  
+    word-break: break-all;
+    overflow-wrap: break-word;
+    white-space: pre-wrap;
+    line-height: 1.4;
 }
 
 .TipContainer {

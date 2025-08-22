@@ -99,6 +99,18 @@ const MapView = ({schoolName, schoolColor}) => {
       const currentLevel = map.getLevel();
       console.log(`현재 지도 레벨: ${currentLevel}`);
     });
+
+    // 지도 이동 완료 이벤트
+    kakao.maps.event.addListener(map, 'dragend', () => {
+      console.log('지도 드래그 완료');
+      updateTooltipSizes(map);
+    });
+
+    // 지도 확대/축소 완료 이벤트
+    kakao.maps.event.addListener(map, 'zoom_changed', () => {
+      console.log('지도 확대/축소 완료');
+      updateTooltipSizes(map);
+    });
   };
 
   const updateTooltipSizes = (map) => {
@@ -217,6 +229,56 @@ const MapView = ({schoolName, schoolColor}) => {
         />
       );
     }
+    
+    // 마커 클릭 이벤트 추가
+    tooltipDiv.addEventListener('click', () => {
+      console.log(`${markerData.name} 마커 클릭됨!`);
+      
+      // 시각적 피드백 추가
+      tooltipDiv.classList.add(styles.clicked);
+      setTimeout(() => {
+        tooltipDiv.classList.remove(styles.clicked);
+      }, 300);
+      
+      // 해당 마커 위치로 지도 중심 이동 (더 확실한 방법)
+      const markerPosition = new kakao.maps.LatLng(markerData.lat, markerData.lng);
+      
+      try {
+        // 방법 1: setCenter 사용 (즉시 이동)
+        map.setCenter(markerPosition);
+        console.log(`setCenter 완료: ${markerData.lat}, ${markerData.lng}`);
+        
+        // 방법 2: panTo 사용 (부드러운 이동)
+        map.panTo(markerPosition);
+        console.log(`panTo 완료: ${markerData.lat}, ${markerData.lng}`);
+        
+        // 지도 레벨을 4로 설정 (확대)
+        map.setLevel(4);
+        console.log(`지도 레벨 4로 설정 완료`);
+        
+        // 지도 이동 완료 후 크기 업데이트 (더 긴 지연)
+        setTimeout(() => {
+          // 툴팁 크기 업데이트
+          updateTooltipSizes(map);
+          
+          // 지도 상태 확인
+          const currentCenter = map.getCenter();
+          const currentLevel = map.getLevel();
+          console.log(`지도 이동 완료 - 중심: ${currentCenter.getLat()}, ${currentCenter.getLng()}, 레벨: ${currentLevel}`);
+          
+          // 추가로 한 번 더 중심 설정 (확실하게)
+          if (Math.abs(currentCenter.getLat() - markerData.lat) > 0.0001 || 
+              Math.abs(currentCenter.getLng() - markerData.lng) > 0.0001) {
+            console.log('위치가 정확하지 않아 재설정합니다');
+            map.setCenter(markerPosition);
+          }
+        }, 800);
+        
+        console.log(`${markerData.name} 위치로 지도 이동 및 레벨 4로 확대 시작`);
+      } catch (error) {
+        console.error('지도 이동 중 오류 발생:', error);
+      }
+    });
     
     // 커스텀 오버레이 생성 (기본 마커 없이)
     var customOverlay = new kakao.maps.CustomOverlay({
