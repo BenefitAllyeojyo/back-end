@@ -1,5 +1,7 @@
 package com.heyoung.global.enums;
 
+import com.heyoung.domain.recommendation.exception.UserCategoryControllerAdvice;
+
 public enum HourBucket {
 
     HOUR_00(0), HOUR_01(1), HOUR_02(2), HOUR_03(3), HOUR_04(4), HOUR_05(5),
@@ -15,7 +17,7 @@ public enum HourBucket {
 
     /** 0~23 외 값이면 IllegalArgumentException */
     public static HourBucket of(int hour) {
-        if (hour < 0 || hour > 23) throw new IllegalArgumentException("hour must be 0..23");
+        if (hour < 0 || hour > 23) throw new UserCategoryControllerAdvice();
         return VALUES[hour];
     }
 

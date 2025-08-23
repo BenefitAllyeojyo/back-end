@@ -1,6 +1,7 @@
 package com.heyoung.domain.recommendation.controller;
 
 import com.heyoung.domain.recommendation.dto.request.SaveUserCategoryRequest;
+import com.heyoung.domain.recommendation.dto.request.SaveUserHourHistRequest;
 import com.heyoung.domain.recommendation.dto.response.SaveSuccessResponse;
 import com.heyoung.domain.recommendation.service.RecommendationCommandService;
 import com.heyoung.global.exception.BaseResponse;
@@ -18,5 +19,10 @@ public class RecommendationController {
     @PostMapping("/category")
     public BaseResponse<SaveSuccessResponse> updateUserCategory(SaveUserCategoryRequest saveUserCategoryRequest) {
         return recommendationCommandService.receiveUserCategory(saveUserCategoryRequest);
+    }
+
+    @PostMapping("/hour")
+    public BaseResponse<SaveSuccessResponse> updateUserHourHist(SaveUserHourHistRequest saveUserHourHistRequest) {
+        return recommendationCommandService.receiveUserHourHist(saveUserHourHistRequest);
     }
 }
