@@ -2,311 +2,478 @@ import React, { useEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import styles from './MapView.module.css';
 import ToolTipModule from '../../molecules/TextGrp/ToolTipModule';
+import LocationPin from '../../atoms/LocationPin';
 import { mapMarkers, mapCenter, mapConfig } from '../../../../public/mock/mapMarkers';
 
-const MapView = ({schoolName, schoolColor}) => {
+const MapView = ({ schoolName = '성신여자대학교', schoolColor }) => {
   const mapRef = useRef(null);
   const mapInstanceRef = useRef(null);
+  const overlaysRef = useRef([]);         // ★ CustomOverlay 인스턴스 보관
   const [mapLoaded, setMapLoaded] = useState(false);
 
-  // mock 데이터에서 가게 정보 가져오기
-  const testMarkers = mapMarkers;
+  // mock 데이터 (여러 개의 마커)
+  const testMarkers = [
+    {
+      id: 1,
+      name: '테스트 가게 1',
+      content: '📍 테스트 가게입니다\n여러 줄 텍스트도 가능합니다',
+      address: '서울특별시 중구 테스트로 123',
+      isSchool: false,
+      lat: 37.5665,
+      lng: 126.9780
+    },
+    {
+      id: 2,
+      name: '테스트 가게 2',
+      content: '📍 두 번째 테스트 가게\n다양한 정보를 표시할 수 있어요',
+      address: '서울특별시 중구 테스트로 456',
+      isSchool: false,
+      lat: 37.5685,
+      lng: 126.9800
+    },
+    {
+      id: 3,
+      name: '테스트 가게 3',
+      content: '📍 세 번째 테스트 가게\n마커를 여러 개 추가했습니다',
+      address: '서울특별시 중구 테스트로 789',
+      isSchool: false,
+      lat: 37.5645,
+      lng: 126.9760
+    }
+  ];
 
   useEffect(() => {
-    // 카카오지도 API가 로드되었는지 확인
-    if (typeof kakao !== 'undefined' && kakao.maps) {
-      initializeMap();
-    } else {
-      // API가 로드되지 않았으면 대기
-      const timer = setInterval(() => {
-        if (typeof kakao !== 'undefined' && kakao.maps) {
-          clearInterval(timer);
-          initializeMap();
-        }
-      }, 100);
-      
-      return () => clearInterval(timer);
-    }
+    let timer;
+    const tryInit = () => {
+      if (typeof kakao !== 'undefined' && kakao.maps) {
+        initializeMap();
+      } else {
+        timer = setInterval(() => {
+          if (typeof kakao !== 'undefined' && kakao.maps) {
+            clearInterval(timer);
+            initializeMap();
+          }
+        }, 100);
+      }
+    };
+
+    tryInit();
+
+    // 언마운트 시 클린업
+    return () => {
+      if (timer) clearInterval(timer);
+      // 오버레이들 해제
+      overlaysRef.current.forEach(ov => ov.setMap(null));
+      overlaysRef.current = [];
+      // 지도 참조 해제
+      mapInstanceRef.current = null;
+      window.currentMap = null;
+    };
   }, []);
 
   const initializeMap = () => {
     if (!mapRef.current) return;
-    
+
     try {
-      // 지도를 담을 영역의 DOM 레퍼런스
-      var mapContainer = mapRef.current;
+      const mapContainer = mapRef.current;
+
+      // 여러 마커의 중앙 좌표 계산
+      const centerLat = (37.5665 + 37.5685 + 37.5645) / 3;
+      const centerLng = (126.9780 + 126.9800 + 126.9760) / 3;
       
-      // 지도를 생성할 때 필요한 기본 옵션 (성신여대 중심)
-      var mapOption = {
-        center: new kakao.maps.LatLng(mapCenter.lat, mapCenter.lng), // 지도의 중심좌표 (성신여대)
-        level: mapConfig.level // 지도의 확대 레벨
+      const mapOption = {
+        center: new kakao.maps.LatLng(centerLat, centerLng),
+        level: 4, // 여러 마커를 모두 보기 위해 레벨 조정
+        draggable: true,
+        scrollwheel: true,
+        disableDoubleClickZoom: false,
+        keyboardShortcuts: true
       };
 
-      // 지도를 생성 및 객체 리턴
-      var map = new kakao.maps.Map(mapContainer, mapOption);
+      const map = new kakao.maps.Map(mapContainer, mapOption);
       mapInstanceRef.current = map;
-      
-      console.log('지도 생성 완료! (성신여대 중심)');
+      window.currentMap = map;
+
       setMapLoaded(true);
-      
-      // ToolTipModule 오버레이만 추가 (기본 마커 없음)
-      addTooltipOverlays(map);
-      
-      // 지도 이벤트 리스너 추가 (확대/축소 시 tooltip 크기 조절)
-      addMapEventListeners(map);
-      
+
+              // 타일 로드 1회성 콜백 (중복 등록 방지)
+        kakao.maps.event.addListener(map, 'tilesloaded', () => {
+          kakao.maps.event.removeListener(map, 'tilesloaded'); // 한 번만
+          addTooltipOverlays(map);
+          addMapEventListeners(map);
+          
+          // 초기 로드 시 즉시 반응형 크기 적용 (숨겨진 툴팁도 포함)
+          setTimeout(() => {
+            updateTooltipSizes(map, true); // true = 초기 로드
+          }, 200);
+        });
+
     } catch (error) {
       console.error('지도 초기화 실패:', error);
     }
   };
 
-  const addTooltipOverlays = (map) => {
-    testMarkers.forEach((markerData) => {
-      // ToolTipModule을 커스텀 오버레이로 추가
-      addTooltipOverlay(map, markerData);
-    });
-  };
+     const addMapEventListeners = (map) => {
+     // 줌 변경 시 즉시 반응형 크기 조정
+     kakao.maps.event.addListener(map, 'zoom_changed', () => {
+       updateTooltipSizes(map);
+     });
 
-  const addMapEventListeners = (map) => {
-    // 지도 확대/축소 이벤트
-    kakao.maps.event.addListener(map, 'zoom_changed', () => {
-      console.log('지도 확대/축소 변경됨');
-      updateTooltipSizes(map);
-    });
+     // 지도 중심 변경 시 즉시 반응형 크기 조정
+     kakao.maps.event.addListener(map, 'center_changed', () => {
+       updateTooltipSizes(map);
+     });
 
-    // 지도 이동 이벤트
-    kakao.maps.event.addListener(map, 'dragend', () => {
-      console.log('지도 이동 완료');
-      updateTooltipSizes(map);
-    });
+     // 드래그 중에도 실시간으로 반응형 크기 조정
+     kakao.maps.event.addListener(map, 'drag', () => {
+       updateTooltipSizes(map);
+     });
 
-    // 지도 중심 변경 이벤트
-    kakao.maps.event.addListener(map, 'center_changed', () => {
-      console.log('지도 중심 변경됨');
-      updateTooltipSizes(map);
-    });
-
-    // 지도 로드 완료 이벤트
-    kakao.maps.event.addListener(map, 'tilesloaded', () => {
-      console.log('지도 타일 로드 완료');
-      updateTooltipSizes(map);
-    });
-
-    // 지도 클릭 이벤트 (테스트용)
     kakao.maps.event.addListener(map, 'click', () => {
-      console.log('지도 클릭됨');
-      // 클릭 시 현재 레벨과 크기 정보 표시
       const currentLevel = map.getLevel();
       console.log(`현재 지도 레벨: ${currentLevel}`);
-    });
-
-    // 지도 이동 완료 이벤트
-    kakao.maps.event.addListener(map, 'dragend', () => {
-      console.log('지도 드래그 완료');
-      updateTooltipSizes(map);
-    });
-
-    // 지도 확대/축소 완료 이벤트
-    kakao.maps.event.addListener(map, 'zoom_changed', () => {
-      console.log('지도 확대/축소 완료');
-      updateTooltipSizes(map);
+      
+      // 지도 클릭 시 모든 툴팁만 숨김 (마커는 유지)
+      hideAllTooltips();
+      
+      // 모든 마커를 원래 상태로 복원 (색상만 변경)
+      overlaysRef.current.forEach(item => {
+        if (item.setImage) {
+          item.setImage(defaultIcon);
+          item.setZIndex(1);
+        }
+      });
     });
   };
 
-  const updateTooltipSizes = (map) => {
+  // === 지도 레벨에 따른 반응형 크기 조정 ===
+  const updateTooltipSizes = (map, isInitialLoad = false) => {
     const currentLevel = map.getLevel();
-    
-    // 지도 레벨에 따른 크기 조절 로직 (레벨 1-14)
-    // 레벨 1(가장 확대) → 마커 작게, 레벨 14(가장 축소) → 마커 크게
-    let scaleFactor;
-    let fontSize;
+    console.log('지도 레벨 변경:', currentLevel, isInitialLoad ? '(초기 로드)' : '');
 
-    if (currentLevel >= 12) {
-      scaleFactor = 0.4;
-      fontSize = '10px';
-    } else if (currentLevel >= 10) {
-      scaleFactor = 0.5;
-      fontSize = '11px';
-    } else if (currentLevel >= 8) {
-      scaleFactor = 0.6;
-      fontSize = '12px';
-    } else if (currentLevel >= 6) {
-      scaleFactor = 0.7;
-      fontSize = '13px';
-    } else if (currentLevel >= 4) {
-      scaleFactor = 0.8;
-      fontSize = '14px';
-    } else if (currentLevel >= 2) {
-      scaleFactor = 0.9;
-      fontSize = '15px';
+    // 레벨에 따른 크기 조정
+    let scaleFactor, fontSize;
+    
+    if (currentLevel <= 3) {
+      scaleFactor = 1.2;      // 확대
+      fontSize = '16px';      // 큰 글자
+    } else if (currentLevel <= 6) {
+      scaleFactor = 1.0;      // 기본 크기
+      fontSize = '14px';      // 기본 글자
+    } else if (currentLevel <= 9) {
+      scaleFactor = 0.8;      // 축소
+      fontSize = '12px';      // 작은 글자
+    } else if (currentLevel <= 12) {
+      scaleFactor = 0.6;      // 더 축소
+      fontSize = '10px';      // 더 작은 글자
     } else {
-      scaleFactor = 1.0;
-      fontSize = '16px';
+      scaleFactor = 0.4;      // 최소 크기
+      fontSize = '8px';       // 최소 글자
     }
 
-    // if (currentLevel <= 2) {
-    //   scaleFactor = 0.4;
-    //   fontSize = '10px';
-    // } else if (currentLevel <= 4) {
-    //   scaleFactor = 0.6;
-    //   fontSize = '11px';
-    // } else if (currentLevel <= 6) {
-    //   scaleFactor = 0.8;
-    //   fontSize = '12px';
-    // } else if (currentLevel <= 8) {
-    //   scaleFactor = 1.0;
-    //   fontSize = '13px';
-    // } else if (currentLevel <= 10) {
-    //   scaleFactor = 1.3;
-    //   fontSize = '14px';
-    // } else if (currentLevel <= 12) {
-    //   scaleFactor = 1.6;
-    //   fontSize = '15px';
-    // } else {
-    //   scaleFactor = 2.0;
-    //   fontSize = '16px';
-    // }
-    
-    // 모든 tooltip의 크기와 글자 크기를 조절
+    // 표시된 툴팁에만 크기와 마진 적용 (애니메이션 효과 없음)
     const tooltips = document.querySelectorAll(`.${styles.tooltipOverlay}`);
-    tooltips.forEach((tooltip) => {
-      tooltip.style.transform = `scale(${scaleFactor})`;
-      tooltip.style.transformOrigin = 'bottom center';
-      tooltip.style.transition = 'transform 0.3s ease-in-out';
-      
-      // 글자 크기도 조절
-      const titleElements = tooltip.querySelectorAll('.ToolTipModuleTitle');
-      const contentElements = tooltip.querySelectorAll('.ToolTipModuleContent');
-      
-      titleElements.forEach((title) => {
-        title.style.fontSize = fontSize;
-        title.style.transition = 'font-size 0.3s ease-in-out';
-      });
-      
-      contentElements.forEach((content) => {
-        content.style.fontSize = `calc(${fontSize} - 2px)`;
-        content.style.transition = 'font-size 0.3s ease-in-out';
-      });
-    });
+    console.log(`툴팁 개수: ${tooltips.length}, 초기 로드: ${isInitialLoad}`);
     
-    console.log(`지도 레벨: ${currentLevel}, 툴팁 크기: ${scaleFactor.toFixed(2)}, 글자 크기: ${fontSize}`);
+    tooltips.forEach((tooltip, index) => {
+      // 초기 로드가 아니면 숨겨진 툴팁은 건드리지 않음
+      if (!isInitialLoad && tooltip.style.display === 'none') {
+        console.log(`툴팁 ${index}: 숨겨짐 - 건드리지 않음`);
+        return;
+      }
+      
+      console.log(`툴팁 ${index}: 처리 중, display: ${tooltip.style.display}`);
+      
+      tooltip.style.transform = `scale(${scaleFactor})`;
+      tooltip.style.transformOrigin = 'top left'; // 왼쪽 위 기준으로 크기 조정
+      
+      // 툴팁 높이만큼 위로 이동 (핀과 겹치지 않도록)
+      const tooltipHeight = tooltip.offsetHeight;
+      const scaledHeight = tooltipHeight * scaleFactor;
+      const dynamicMarginTop = `-${scaledHeight + 10}px`; // 10px 여유 공간 추가
+      
+      tooltip.style.marginTop = dynamicMarginTop;
+      
+      // 내부 텍스트 크기도 조정 (애니메이션 효과 없음)
+      const titleEls = tooltip.querySelectorAll('.ToolTipModuleTitle');
+      const contentEls = tooltip.querySelectorAll('.ToolTipModuleContent');
+      
+      titleEls.forEach(el => {
+        el.style.fontSize = fontSize;
+      });
+      
+      contentEls.forEach(el => {
+        el.style.fontSize = `calc(${fontSize} - 2px)`;
+      });
+      
+      // 초기 로드 시 마진 적용 후 툴팁을 다시 숨김
+      if (isInitialLoad) {
+        tooltip.style.display = 'none';
+      }
+      
+      console.log(`툴팁 ${index}: 마진 적용 완료 - marginTop: ${tooltip.style.marginTop}, transform: ${tooltip.style.transform}`);
+    });
+
+    console.log(`레벨 ${currentLevel}: 크기 ${scaleFactor.toFixed(1)}x, 글자 ${fontSize}`);
   };
 
-  const addTooltipOverlay = (map, markerData) => {
-    // ToolTipModule을 담을 div 생성
-    const tooltipDiv = document.createElement('div');
-    tooltipDiv.className = styles.tooltipOverlay;
-    
-    // 성신여대인 경우 특별한 학교 툴팁 생성
-    if (markerData.isSchool) {
-      const root = createRoot(tooltipDiv);
-      root.render(
-        <div className={styles.schoolTooltip}>
-          <div className={styles.schoolIcon}>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="32"
-              height="32"
-              viewBox="0 0 24 24"
-              fill="none"
-            >
-              <path d="M12 3L1 9L12 15L21 10.09V17H23V9M5 13.18V17.18L12 21L19 17.18V13.18L12 17L5 13.18Z" fill="#2196f3"/>
-            </svg>
-          </div>
-          <div className={styles.schoolInfo}>
-            <div className={styles.schoolName}>{markerData.name}</div>
-            <div className={styles.schoolContent}>{markerData.content}</div>
-          </div>
-        </div>
-      );
-    } else {
-      // 일반 가게는 기존 ToolTipModule 사용
-      const root = createRoot(tooltipDiv);
-      root.render(
-        <ToolTipModule 
-          name={markerData.name}
-          content={markerData.content}
-        />
-      );
-    }
-    
-    // 마커 클릭 이벤트 추가
-    tooltipDiv.addEventListener('click', () => {
-      console.log(`${markerData.name} 마커 클릭됨!`);
-      
-      // 시각적 피드백 추가
-      tooltipDiv.classList.add(styles.clicked);
-      setTimeout(() => {
-        tooltipDiv.classList.remove(styles.clicked);
-      }, 300);
-      
-      // 해당 마커 위치로 지도 중심 이동 (더 확실한 방법)
-      const markerPosition = new kakao.maps.LatLng(markerData.lat, markerData.lng);
-      
-      try {
-        // 방법 1: setCenter 사용 (즉시 이동)
-        map.setCenter(markerPosition);
-        console.log(`setCenter 완료: ${markerData.lat}, ${markerData.lng}`);
-        
-        // 방법 2: panTo 사용 (부드러운 이동)
-        map.panTo(markerPosition);
-        console.log(`panTo 완료: ${markerData.lat}, ${markerData.lng}`);
-        
-        // 지도 레벨을 4로 설정 (확대)
-        map.setLevel(4);
-        console.log(`지도 레벨 4로 설정 완료`);
-        
-        // 지도 이동 완료 후 크기 업데이트 (더 긴 지연)
-        setTimeout(() => {
-          // 툴팁 크기 업데이트
-          updateTooltipSizes(map);
-          
-          // 지도 상태 확인
-          const currentCenter = map.getCenter();
-          const currentLevel = map.getLevel();
-          console.log(`지도 이동 완료 - 중심: ${currentCenter.getLat()}, ${currentCenter.getLng()}, 레벨: ${currentLevel}`);
-          
-          // 추가로 한 번 더 중심 설정 (확실하게)
-          if (Math.abs(currentCenter.getLat() - markerData.lat) > 0.0001 || 
-              Math.abs(currentCenter.getLng() - markerData.lng) > 0.0001) {
-            console.log('위치가 정확하지 않아 재설정합니다');
-            map.setCenter(markerPosition);
-          }
-        }, 800);
-        
-        console.log(`${markerData.name} 위치로 지도 이동 및 레벨 4로 확대 시작`);
-      } catch (error) {
-        console.error('지도 이동 중 오류 발생:', error);
+  // === 마커와 오버레이 관리 ===
+  const clearAllOverlays = (map) => {
+    console.log('기존 오버레이 제거 중...', overlaysRef.current.length);
+    overlaysRef.current.forEach(item => {
+      if (item.setMap) {
+        item.setMap(null); // 마커나 오버레이 제거
       }
     });
+    overlaysRef.current = [];
+  };
+
+  // 모든 툴팁을 숨기는 함수
+  const hideAllTooltips = () => {
+    const tooltips = document.querySelectorAll(`.${styles.tooltipOverlay}`);
+    tooltips.forEach(tooltip => {
+      tooltip.style.display = 'none';
+    });
+    console.log('모든 툴팁 숨김');
+  };
+
+  // 특정 툴팁을 제외한 다른 모든 툴팁을 숨기는 함수
+  const hideOtherTooltips = (currentTooltip) => {
+    const tooltips = document.querySelectorAll(`.${styles.tooltipOverlay}`);
+    tooltips.forEach(tooltip => {
+      if (tooltip !== currentTooltip) {
+        tooltip.style.display = 'none';
+      }
+    });
+    console.log('다른 툴팁들 숨김');
+  };
+
+  // 핀 오른쪽으로 중심 이동하여 툴팁이 완전히 보이도록 하는 함수
+  const centerMapForTooltip = (map, markerPosition, onComplete) => {
+    const currentCenter = map.getCenter();
+    const currentLevel = map.getLevel();
     
-    // 커스텀 오버레이 생성 (기본 마커 없이)
-    var customOverlay = new kakao.maps.CustomOverlay({
+    // 줌 레벨에 따라 이동 거리 조정 (레벨이 클수록 더 많이 이동)
+    let offsetX = 0;
+    if (currentLevel <= 3) {
+      offsetX = 0.001; // 매우 확대된 상태
+    } else if (currentLevel <= 6) {
+      offsetX = 0.002; // 확대된 상태
+    } else if (currentLevel <= 9) {
+      offsetX = 0.003; // 보통 상태
+    } else {
+      offsetX = 0.004; // 축소된 상태
+    }
+    
+    // 핀 오른쪽으로 중심 이동
+    const newCenter = new kakao.maps.LatLng(
+      markerPosition.getLat(),
+      markerPosition.getLng() + offsetX
+    );
+    
+    console.log('지도 이동 시작...');
+    map.panTo(newCenter);
+    
+    // 이동 완료 후 콜백 실행
+    setTimeout(() => {
+      console.log('지도 이동 완료!');
+      if (onComplete && typeof onComplete === 'function') {
+        onComplete();
+      }
+    }, 800); // 지도 이동 애니메이션 완료 대기
+  };
+
+  const refreshOverlays = (map) => {
+    addTooltipOverlays(map);
+  };
+
+  const addTooltipOverlays = (map) => {
+    console.log('addTooltipOverlays 시작...', testMarkers);
+    if (!testMarkers || testMarkers.length === 0) return;
+    if (!map) return;
+
+    clearAllOverlays(map);
+    testMarkers.forEach((markerData, index) => {
+      console.log(`마커 ${index + 1} 추가 중:`, markerData);
+      addTooltipOverlay(map, markerData);
+    });
+    console.log('addTooltipOverlays 완료');
+  };
+
+  // 기본 마커는 크기 조정이 자동으로 됨 (카카오맵에서 관리)
+
+  // === 핀만 표시하고 클릭 시 툴팁 표시 ===
+  const addTooltipOverlay = (map, markerData) => {
+    console.log('addTooltipOverlay 시작:', markerData.name);
+    const markerPosition = new kakao.maps.LatLng(markerData.lat, markerData.lng);
+
+    // 1. 커스텀 SVG 마커 이미지로 생성 (색상 변경 가능)
+    const defaultIcon = new kakao.maps.MarkerImage(
+      'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
+        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="40" viewBox="0 0 18 25" fill="none">
+          <path d="M18 9.52335C18 13.6309 12.5156 20.9435 10.1109 23.9607C9.53438 24.6798 8.46562 24.6798 7.88906 23.9607C5.44219 20.9435 0 13.6309 0 9.52335C0 4.53983 4.02938 0.5 9 0.5C13.9688 0.5 18 4.53983 18 9.52335Z" fill="#542BA8"/>
+          <path d="M18 9.52335C18 13.6309 12.5156 20.9435 10.1109 23.9607C9.53438 24.6798 8.46562 24.6798 7.88906 23.9607C5.44219 20.9435 0 13.6309 0 9.52335C0 4.53983 4.02938 0.5 9 0.5C13.9688 0.5 18 4.53983 18 9.52335Z" fill="black" fill-opacity="0.2"/>
+          <path d="M18 9.52335C18 13.6309 12.5156 20.9435 10.1109 23.9607C9.53438 24.6798 8.46562 24.6798 7.88906 23.9607C5.44219 20.9435 0 13.6309 0 9.52335C0 4.53983 4.02938 0.5 9 0.5C13.9688 0.5 18 4.53983 18 9.52335Z" fill="black" fill-opacity="0.2"/>
+          <path d="M18 9.52335C18 13.6309 12.5156 20.9435 10.1109 23.9607C9.53438 24.6798 8.46562 24.6798 7.88906 23.9607C5.44219 20.9435 0 13.6309 0 9.52335C0 4.53983 4.02938 0.5 9 0.5C13.9688 0.5 18 4.53983 18 9.52335Z" fill="black" fill-opacity="0.2"/>
+          <circle cx="9" cy="9.5" r="3" fill="white"/>
+        </svg>
+      `),
+      new kakao.maps.Size(32, 40),
+      { offset: new kakao.maps.Point(16, 40) }
+    );
+    
+    const clickedIcon = new kakao.maps.MarkerImage(
+      'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
+        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="40" viewBox="0 0 18 25" fill="white">
+          <path d="M18 9.52335C18 13.6309 12.5156 20.9435 10.1109 23.9607C9.53438 24.6798 8.46562 24.6798 7.88906 23.9607C5.44219 20.9435 0 13.6309 0 9.52335C0 4.53983 4.02938 0.5 9 0.5C13.9688 0.5 18 4.53983 18 9.52335Z" fill="#FF616D"/>
+          <path d="M18 9.52335C18 13.6309 12.5156 20.9435 10.1109 23.9607C9.53438 24.6798 8.46562 24.6798 7.88906 23.9607C5.44219 20.9435 0 13.6309 0 9.52335C0 4.53983 4.02938 0.5 9 0.5C13.9688 0.5 18 4.53983 18 9.52335Z" fill="black" fill-opacity="0.2"/>
+          <path d="M18 9.52335C18 13.6309 12.5156 20.9435 10.1109 23.9607C9.53438 24.6798 8.46562 24.6798 7.88906 23.9607C5.44219 20.9435 0 13.6309 0 9.52335C0 4.53983 4.02938 0.5 9 0.5C13.9688 0.5 18 4.53983 18 9.52335Z" fill="black" fill-opacity="0.2"/>
+          <path d="M18 9.52335C18 13.6309 12.5156 20.9435 10.1109 23.9607C9.53438 24.6798 8.46562 24.6798 7.88906 23.9607C5.44219 20.9435 0 13.6309 0 9.52335C0 4.53983 4.02938 0.5 9 0.5C13.9688 0.5 18 4.53983 18 9.52335Z" fill="black" fill-opacity="0.2"/>
+          <circle cx="9" cy="9.5" r="3" fill="white"/>
+        </svg>
+      `),
+      new kakao.maps.Size(32, 40),
+      { offset: new kakao.maps.Point(16, 40) }
+    );
+    
+    const marker = new kakao.maps.Marker({
+      position: markerPosition,
       map: map,
-      position: new kakao.maps.LatLng(markerData.lat, markerData.lng),
-      content: tooltipDiv,
-      yAnchor: 1.2 // 위치 위에 표시
+      image: defaultIcon,
+      zIndex: 1 // 기본 마커는 낮은 zIndex
     });
     
-    console.log(`${markerData.name} ToolTipModule 오버레이 추가 완료`);
+    console.log('커스텀 마커 생성 완료');
+
+    // 2. ToolTipModule을 content로 사용 (초기에는 숨김)
+    const tooltipDiv = document.createElement('div');
+    tooltipDiv.className = styles.tooltipOverlay;
+    tooltipDiv.style.display = 'none'; // 초기에는 숨김
+    tooltipDiv.style.zIndex = '9999'; // 마커보다 위에 표시
+
+    const tooltipRoot = createRoot(tooltipDiv);
+    tooltipRoot.render(
+      <ToolTipModule
+        name={markerData.name}
+        content={markerData.content}
+        address={markerData.address}
+        lat={markerData.lat}
+        lng={markerData.lng}
+      />
+    );
+
+    // 3. 커스텀 오버레이 생성 (초기에는 숨김)
+    const customOverlay = new kakao.maps.CustomOverlay({
+      map: map,
+      position: markerPosition,
+      content: tooltipDiv,
+      yAnchor: 1,
+      zIndex: 9999 // 마커보다 위에 표시
+    });
+
+    // 마커 클릭 이벤트 (툴팁 표시/숨김 토글 + 마커 색상 변경)
+    marker.addListener('click', () => {
+      const currentMap = window.currentMap || map;
+      if (!currentMap) return;
+
+      try {
+        // 툴팁 표시/숨김 토글
+        if (tooltipDiv.style.display === 'none') {
+          console.log('툴팁 표시 시작...');
+          
+          // 다른 모든 툴팁을 먼저 숨김 (현재 툴팁은 제외)
+          hideOtherTooltips(tooltipDiv);
+          
+          // 다른 모든 마커를 원래 상태로 복원
+          overlaysRef.current.forEach(item => {
+            if (item.setImage && item !== marker) {
+              item.setImage(defaultIcon);
+              item.setZIndex(1);
+            }
+          });
+          
+          // 클릭된 마커를 #FF616D 색상으로 변경
+          marker.setZIndex(1000); // 클릭된 마커를 위로 올림
+          marker.setImage(clickedIcon);
+          console.log('마커 색상 변경 완료');
+          
+          console.log('마커 클릭됨 - 색상 변경 완료, 지도 이동 시작');
+          
+                  // 지도 이동 없이 툴팁만 표시 (안정성 우선)
+        tooltipDiv.style.display = 'block';
+        console.log('툴팁 표시됨');
+        
+        // 툴팁 표시 후 마진 재계산
+        setTimeout(() => {
+          if (tooltipDiv.style.display !== 'none') {
+            updateTooltipSizes(map);
+            console.log('툴팁 마진 재계산 완료');
+          }
+        }, 200);
+        
+        console.log('마커 클릭됨 - 툴팁 표시, 색상 변경 완료 (지도 이동 없음)');
+        } else {
+          console.log('툴팁 숨김 시작...');
+          
+          // 툴팁이 숨겨질 때 원래 상태로 복원
+          marker.setZIndex(1);
+          marker.setImage(defaultIcon);
+          console.log('마커 색상 복원 완료');
+          
+          // 현재 툴팁 숨김 (마지막에 실행)
+          tooltipDiv.style.display = 'none';
+          console.log('툴팁 숨겨짐');
+          
+          console.log('마커 클릭 해제됨 - 툴팁 숨김, 색상 복원 완료');
+        }
+      } catch (error) {
+        console.error('마커 클릭 처리 중 오류:', error);
+      }
+    });
+
+    // 마커와 오버레이를 배열에 추가
+    overlaysRef.current.push(marker);
+    overlaysRef.current.push(customOverlay);
+    
+    console.log('마커와 오버레이 추가 완료. 총 개수:', overlaysRef.current.length);
   };
 
   return (
     <div className={styles.mapContainer}>
-      <div 
+      <div
         ref={mapRef}
         id="map"
         className={styles.map}
         style={{ width: `${mapConfig.width}px`, height: `${mapConfig.height}px` }}
       />
-      
-      {/* 지도 위에 추가 정보 표시 */}
       {mapLoaded && (
         <div className={styles.mapInfo}>
           <h3>🏫 {schoolName} 주변 지도</h3>
           <p>{schoolName} 주변의 다양한 가게들과 편의시설을 확인할 수 있습니다!</p>
-          
-          {/* 위치 목록 표시 */}
+
+          <div className={styles.refreshControls}>
+            <button
+              onClick={() => mapInstanceRef.current && refreshOverlays(mapInstanceRef.current)}
+              className={styles.refreshButton}
+            >
+              🔄 툴팁 새로고침
+            </button>
+            <button
+              onClick={() => {
+                if (mapInstanceRef.current) {
+                  addTooltipOverlays(mapInstanceRef.current);
+                }
+              }}
+              className={styles.refreshButton}
+              style={{ marginLeft: '10px' }}
+            >
+              🎯 툴팁 강제 추가
+            </button>
+            <span className={styles.refreshInfo}>
+              지도 이동/확대 시 자동으로 핀이 재렌더링됩니다
+            </span>
+          </div>
+
           <div className={styles.locationList}>
             <h4>📍 표시된 위치들:</h4>
             <ul>
@@ -323,6 +490,7 @@ const MapView = ({schoolName, schoolColor}) => {
               ))}
             </ul>
           </div>
+
         </div>
       )}
     </div>
