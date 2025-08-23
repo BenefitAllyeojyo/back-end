@@ -3,19 +3,24 @@ package com.heyoung.domain.benefit.service;
 import com.heyoung.domain.benefit.dto.PartnershipDto;
 import com.heyoung.domain.benefit.entity.Partnership;
 import com.heyoung.domain.benefit.repository.PartnershipRepository;
+import com.heyoung.domain.university.entity.UserUniversity;
+import com.heyoung.domain.university.repository.UserUniversityRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 
 @Service
 public class PartnershipService {
     private final PartnershipRepository partnershipRepository;
+    private final UserUniversityRepository userUniversityRepository;
 
-    public PartnershipService(PartnershipRepository partnershipRepository) {
+    public PartnershipService(PartnershipRepository partnershipRepository, UserUniversityRepository userUniversityRepository) {
         this.partnershipRepository = partnershipRepository;
+        this.userUniversityRepository = userUniversityRepository;
     }
 
     // 모든 대학의 Partnership
@@ -27,9 +32,12 @@ public class PartnershipService {
                 .collect(Collectors.toList());
     }
 
-    // 특정 대학의 Partnership
+    // 사용자 대학의 Partnership
     @Transactional(readOnly = true)
-    public List<PartnershipDto> findPartnershipsByUniversityId(Long universityId) {
+    public List<PartnershipDto> findPartnerships(Long memberId) {
+        Optional<UserUniversity> userUniversityOptional = userUniversityRepository.findByUserId(memberId);
+        UserUniversity userUniversity = userUniversityOptional.get();
+        Long universityId = userUniversity.getUniversity().getId();
         List<Partnership> partnerships = partnershipRepository.findByUniversityId(universityId);
         return partnerships.stream()
                 .map(PartnershipDto::new)

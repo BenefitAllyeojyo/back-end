@@ -2,6 +2,7 @@ package com.heyoung.domain.benefit.controller;
 
 import com.heyoung.domain.benefit.dto.PartnershipDto;
 import com.heyoung.domain.benefit.service.PartnershipService;
+import com.heyoung.global.webconfig.MemberId;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,9 +17,9 @@ public class PartnershipController {
         this.partnershipService = partnershipService;
     }
 
-    @GetMapping("/university/{universityId}")
-    public List<PartnershipDto> getPartnershipsByUniversityId(@PathVariable Long universityId) {
-        return partnershipService.findPartnershipsByUniversityId(universityId);
+    @GetMapping("/university")
+    public List<PartnershipDto> getPartnerships(@MemberId Long memberId) {
+        return partnershipService.findPartnerships(memberId);
     }
 
 }
