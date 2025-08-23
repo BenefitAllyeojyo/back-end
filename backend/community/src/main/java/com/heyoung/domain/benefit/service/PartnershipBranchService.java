@@ -4,9 +4,9 @@ import com.heyoung.domain.benefit.dto.PartnershipBranchDto;
 import com.heyoung.domain.benefit.entity.PartnershipBranch;
 import com.heyoung.domain.benefit.repository.PartnershipBranchRepository;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.stream.Collectors;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class PartnershipBranchService {
@@ -16,6 +16,7 @@ public class PartnershipBranchService {
         this.partnershipBranchRepository = partnershipBranchRepository;
     }
 
+    @Transactional(readOnly = true)
     public List<PartnershipBranchDto> findAllPartnershipBranches(Long partnershipBranchId) {
         List<PartnershipBranch> partnershipBranches = partnershipBranchRepository.findByPartnershipId(partnershipBranchId);
         return partnershipBranches.stream()
