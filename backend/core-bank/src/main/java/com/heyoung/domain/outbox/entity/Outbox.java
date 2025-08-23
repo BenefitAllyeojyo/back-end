@@ -26,7 +26,6 @@ import java.time.Instant;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Outbox extends BaseEntity {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -55,9 +54,4 @@ public class Outbox extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column
     private DeliveryErrorType lastError; // 마지막 전송이 실패한 이유
-
-    public Outbox from(Transaction transaction) {
-
-    }
-
 }

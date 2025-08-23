@@ -2,8 +2,8 @@ package com.heyoung.domain.outbox.converter;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.heyoung.domain.outbox.dto.response.AccountOutputDto;
-import com.heyoung.domain.outbox.dto.response.TransactionOutputDto;
+import com.heyoung.domain.outbox.dto.response.AccountResponseDto;
+import com.heyoung.domain.outbox.dto.response.TransactionResponseDto;
 import com.heyoung.domain.outbox.entity.Outbox;
 import com.heyoung.domain.outbox.exception.advice.OutboxControllerAdvice;
 import com.heyoung.domain.payment.dto.response.TransactionListResponse;
@@ -14,7 +14,6 @@ import com.heyoung.global.utils.UuidUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,7 +29,7 @@ public class OutBoxConverter {
         String json = null;
         try {
             json = om.writeValueAsString(
-                    new TransactionOutputDto(transaction.getUser().getId(), transaction.getCategory().getId(), transaction.getTransactionDateTime())
+                    new TransactionResponseDto(transaction.getUser().getId(), transaction.getCategory().getId(), transaction.getTransactionDateTime())
             );
         } catch (JsonProcessingException e) {
             throw new OutboxControllerAdvice(ResponseCode.JSON_CREATE_FAIL);
@@ -49,7 +48,7 @@ public class OutBoxConverter {
             String json = null;
             try {
                 json = om.writeValueAsString(
-                        new AccountOutputDto(data.getUserId(), data.getTransactionTime())
+                        new AccountResponseDto(data.getUserId(), data.getTransactionTime())
                 );
             } catch (JsonProcessingException e) {
                 throw new OutboxControllerAdvice(ResponseCode.JSON_CREATE_FAIL);
