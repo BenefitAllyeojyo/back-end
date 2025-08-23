@@ -2,6 +2,8 @@ package com.heyoung.domain.benefit.controller;
 
 import com.heyoung.domain.benefit.dto.PartnershipBranchDto;
 import com.heyoung.domain.benefit.service.PartnershipBranchService;
+import com.heyoung.global.exception.BaseResponse;
+import com.heyoung.global.exception.ResponseCode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,8 +26,8 @@ public class PartnershipBranchController {
 
     @Operation(summary="모든 제휴 지점의 정보를 조회하는 API", description = "모든 제휴 지점의 정보를 조회하는 API입니다.")
     @GetMapping("/{partnershipId}/branches")
-    public List<PartnershipBranchDto> getAllPartnershipBranches(@PathVariable Long partnershipId) {
-        return partnershipBranchService.findAllPartnershipBranches(partnershipId);
+    public BaseResponse<List<PartnershipBranchDto>> getAllPartnershipBranches(@PathVariable Long partnershipId) {
+        return BaseResponse.onSuccess(partnershipBranchService.findAllPartnershipBranches(partnershipId), ResponseCode.OK);
     }
 
 }
