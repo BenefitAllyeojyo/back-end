@@ -19,7 +19,10 @@ public enum ResponseCode {
     _BAD_REQUEST(HttpStatus.BAD_REQUEST,"COMMON001","잘못된 요청입니다."),
     _UNAUTHORIZED(HttpStatus.UNAUTHORIZED,"COMMON002","권한이 잘못되었습니다"),
     _METHOD_NOT_ALLOWED(HttpStatus.METHOD_NOT_ALLOWED, "COMMON003", "지원하지 않는 Http Method 입니다."),
-    _FORBIDDEN(HttpStatus.FORBIDDEN, "COMMON004", "금지된 요청입니다.");
+    _FORBIDDEN(HttpStatus.FORBIDDEN, "COMMON004", "금지된 요청입니다."),
+
+    // JsonError
+    JSON_CREATE_FAIL(HttpStatus.INTERNAL_SERVER_ERROR, "JSON001", "JSON 파일 생성에 실패했습니다.");
 
     private final HttpStatus httpStatus;
     private final String code;
