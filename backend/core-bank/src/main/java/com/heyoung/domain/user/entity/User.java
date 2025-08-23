@@ -34,7 +34,4 @@ public class User extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(length = 8)
     private UserStatus status;
-
-    @Column(nullable = false)
-    private Long universityId;
 }
