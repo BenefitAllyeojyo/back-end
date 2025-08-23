@@ -40,6 +40,7 @@ public class RecommendationCommandServiceImpl implements RecommendationCommandSe
 
         HourBucket hourBucket = HourBucket.of(changeToHour(saveUserCategoryRequest.transactionDateTime()));
         updateUserHourHist(getUserHourHist(saveUserCategoryRequest.userId(), hourBucket), saveUserCategoryRequest.userId(), hourBucket);
+
         return BaseResponse.onSuccess(new SaveSuccessResponse("카테고리 선호도와 시간대 선호도를 반영했습니다."), ResponseCode.OK);
 
     }
