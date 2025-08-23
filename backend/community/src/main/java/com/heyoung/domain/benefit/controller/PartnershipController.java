@@ -2,6 +2,8 @@ package com.heyoung.domain.benefit.controller;
 
 import com.heyoung.domain.benefit.dto.PartnershipDto;
 import com.heyoung.domain.benefit.service.PartnershipService;
+import com.heyoung.global.exception.BaseResponse;
+import com.heyoung.global.exception.ResponseCode;
 import com.heyoung.global.webconfig.MemberId;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.*;
@@ -21,7 +23,8 @@ public class PartnershipController {
 
     @Operation(summary="사용자 대학의 제휴 정보를 조회하는 API", description = "사용자 대학의 제휴 정보를 조회하는 API입니다.")
     @GetMapping("/university")
-    public List<PartnershipDto> getPartnerships(@MemberId Long memberId) {
-        return partnershipService.findPartnerships(memberId);
+    public BaseResponse<List<PartnershipDto>> getPartnerships(@MemberId Long memberId) {
+        return BaseResponse.onSuccess(partnershipService.findPartnerships(memberId), ResponseCode.OK);
     }
+
 }
