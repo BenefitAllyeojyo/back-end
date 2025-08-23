@@ -97,16 +97,35 @@ const MapView = ({ schoolName = '성신여자대학교', schoolColor }) => {
       setMapLoaded(true);
 
               // 타일 로드 1회성 콜백 (중복 등록 방지)
+        // 초기 로드 시 마커 즉시 추가 (tilesloaded 이벤트와 별개로)
+        console.log('지도 초기화 완료, 마커 추가 시작...');
+        addTooltipOverlays(map);
+        addMapEventListeners(map);
+        
+        // tilesloaded 이벤트도 백업으로 추가
         kakao.maps.event.addListener(map, 'tilesloaded', () => {
-          kakao.maps.event.removeListener(map, 'tilesloaded'); // 한 번만
-          addTooltipOverlays(map);
-          addMapEventListeners(map);
-          
-          // 초기 로드 시 즉시 반응형 크기 적용 (숨겨진 툴팁도 포함)
-          setTimeout(() => {
-            updateTooltipSizes(map, true); // true = 초기 로드
-          }, 200);
+          console.log('tilesloaded 이벤트 발생 - 마커 재확인');
+          // 마커가 없으면 다시 추가
+          if (overlaysRef.current.length === 0) {
+            console.log('마커가 없어서 다시 추가');
+            addTooltipOverlays(map);
+          }
         });
+        
+        // 초기 로드 시 즉시 반응형 크기 적용 (숨겨진 툴팁도 포함)
+        setTimeout(() => {
+          console.log('초기 로드 후 마커 상태 확인...');
+          console.log('총 오버레이 수:', overlaysRef.current.length);
+          
+          // 마커가 제대로 표시되었는지 확인
+          overlaysRef.current.forEach((item, index) => {
+            if (item.getMap) {
+              console.log(`오버레이 ${index}: 지도에 표시됨:`, item.getMap() !== null);
+            }
+          });
+          
+          updateTooltipSizes(map, true); // true = 초기 로드
+        }, 500);
 
     } catch (error) {
       console.error('지도 초기화 실패:', error);
@@ -188,7 +207,7 @@ const MapView = ({ schoolName = '성신여자대학교', schoolColor }) => {
       tooltip.style.transformOrigin = 'top left'; // 왼쪽 위 기준으로 크기 조정
       
       // 툴팁 높이만큼 위로 이동 (핀과 겹치지 않도록)
-      const tooltipHeight = tooltip.offsetHeight;
+      const tooltipHeight = tooltip.offsetHeight || 100; // 기본값 설정
       const scaledHeight = tooltipHeight * scaleFactor;
       const dynamicMarginTop = `-${scaledHeight + 10}px`; // 10px 여유 공간 추가
       
@@ -249,7 +268,7 @@ const MapView = ({ schoolName = '성신여자대학교', schoolColor }) => {
   };
 
   // 핀 오른쪽으로 중심 이동하여 툴팁이 완전히 보이도록 하는 함수
-  const centerMapForTooltip = (map, markerPosition, onComplete) => {
+  const centerMapForTooltip = (map, markerPosition) => {
     const currentCenter = map.getCenter();
     const currentLevel = map.getLevel();
     
@@ -273,14 +292,7 @@ const MapView = ({ schoolName = '성신여자대학교', schoolColor }) => {
     
     console.log('지도 이동 시작...');
     map.panTo(newCenter);
-    
-    // 이동 완료 후 콜백 실행
-    setTimeout(() => {
-      console.log('지도 이동 완료!');
-      if (onComplete && typeof onComplete === 'function') {
-        onComplete();
-      }
-    }, 800); // 지도 이동 애니메이션 완료 대기
+    console.log('지도 이동 명령 완료');
   };
 
   const refreshOverlays = (map) => {
@@ -289,15 +301,25 @@ const MapView = ({ schoolName = '성신여자대학교', schoolColor }) => {
 
   const addTooltipOverlays = (map) => {
     console.log('addTooltipOverlays 시작...', testMarkers);
-    if (!testMarkers || testMarkers.length === 0) return;
-    if (!map) return;
+    if (!testMarkers || testMarkers.length === 0) {
+      console.log('testMarkers가 비어있음');
+      return;
+    }
+    if (!map) {
+      console.log('map이 null임');
+      return;
+    }
 
+    console.log('기존 오버레이 제거 중...');
     clearAllOverlays(map);
+    
+    console.log(`${testMarkers.length}개의 마커 추가 시작`);
     testMarkers.forEach((markerData, index) => {
       console.log(`마커 ${index + 1} 추가 중:`, markerData);
       addTooltipOverlay(map, markerData);
     });
-    console.log('addTooltipOverlays 완료');
+    
+    console.log('addTooltipOverlays 완료, 총 오버레이 수:', overlaysRef.current.length);
   };
 
   // 기본 마커는 크기 조정이 자동으로 됨 (카카오맵에서 관리)
@@ -399,19 +421,28 @@ const MapView = ({ schoolName = '성신여자대학교', schoolColor }) => {
           
           console.log('마커 클릭됨 - 색상 변경 완료, 지도 이동 시작');
           
-                  // 지도 이동 없이 툴팁만 표시 (안정성 우선)
+                  // 툴팁을 먼저 표시 (지도 이동 전에)
+        console.log('툴팁 표시 시작...');
         tooltipDiv.style.display = 'block';
         console.log('툴팁 표시됨');
         
-        // 툴팁 표시 후 마진 재계산
+        // 지도 이동을 툴팁 표시 후에 실행
+        setTimeout(() => {
+          console.log('지도 이동 시작...');
+          centerMapForTooltip(currentMap, markerPosition);
+        }, 100); // 툴팁 표시 후 100ms 뒤 지도 이동
+        
+        // 마진 재계산을 더 늦게 실행
         setTimeout(() => {
           if (tooltipDiv.style.display !== 'none') {
             updateTooltipSizes(map);
             console.log('툴팁 마진 재계산 완료');
+          } else {
+            console.log('툴팁이 이미 숨겨짐 - 마진 재계산 생략');
           }
-        }, 200);
+        }, 800); // 지도 이동 완료 후 마진 재계산
         
-        console.log('마커 클릭됨 - 툴팁 표시, 색상 변경 완료 (지도 이동 없음)');
+        console.log('마커 클릭됨 - 툴팁 표시, 색상 변경 완료, 지도 이동 예약');
         } else {
           console.log('툴팁 숨김 시작...');
           
@@ -436,6 +467,8 @@ const MapView = ({ schoolName = '성신여자대학교', schoolColor }) => {
     overlaysRef.current.push(customOverlay);
     
     console.log('마커와 오버레이 추가 완료. 총 개수:', overlaysRef.current.length);
+    console.log('현재 마커 위치:', markerPosition.getLat(), markerPosition.getLng());
+    console.log('마커가 지도에 표시됨:', marker.getMap() !== null);
   };
 
   return (
