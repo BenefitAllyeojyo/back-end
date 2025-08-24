@@ -6,11 +6,28 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://api.brainpix.n
  */
 export const fetchCategories = async () => {
   try {
-    // 실제 API 호출
-    const response = await fetch(`${API_BASE_URL}/partnerships/categories`);
+    // 실제 API 호출 (타임아웃 설정)
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10초 타임아웃
+    
+    const response = await fetch(`${API_BASE_URL}/partnerships/categories`, {
+      signal: controller.signal
+    });
+    
+    clearTimeout(timeoutId);
+    
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+    
     const data = await response.json();
     
     if (data.isSuccess && data.result) {
+      // 새로운 API 구조에서 카테고리 정보 추출
+      const uniqueCategories = data.result;
+      
+      console.log('API에서 카테고리 데이터 가져오기 성공:', uniqueCategories);
+      
       // API 응답을 UI에 맞는 형태로 변환
       const categoryMapping = {
         'CAFE': {
@@ -33,10 +50,24 @@ export const fetchCategories = async () => {
           icon: '🏪',
           color: '#10B981',
           textColor: '#FFFFFF'
+        },
+        'FOOD': {
+          code: 'food',
+          displayName: '음식점',
+          icon: '🍽️',
+          color: '#F59E0B',
+          textColor: '#FFFFFF'
+        },
+        'CULTURE': {
+          code: 'culture',
+          displayName: '문화',
+          icon: '🎭',
+          color: '#8B5CF6',
+          textColor: '#FFFFFF'
         }
       };
       
-      return data.result.map((categoryName, index) => {
+      return uniqueCategories.map((categoryName, index) => {
         const mapping = categoryMapping[categoryName];
         
         if (mapping) {
@@ -67,39 +98,8 @@ export const fetchCategories = async () => {
       });
     }
     
-    // API 실패 시 기본 카테고리 반환
-    return [
-      {
-        id: 1,
-        code: 'cafe',
-        name: '카페',
-        displayName: '카페',
-        icon: '☕',
-        color: '#7C3AED',
-        textColor: '#FFFFFF',
-        isActive: true
-      },
-      {
-        id: 2,
-        code: 'beauty',
-        name: '뷰티',
-        displayName: '뷰티',
-        icon: '💄',
-        color: '#EC4899',
-        textColor: '#FFFFFF',
-        isActive: true
-      },
-      {
-        id: 3,
-        code: 'convenience',
-        name: '편의점',
-        displayName: '편의점',
-        icon: '🏪',
-        color: '#10B981',
-        textColor: '#FFFFFF',
-        isActive: true
-      }
-    ];
+    // API 실패 시 빈 배열 반환
+    return [];
   } catch (error) {
     console.error('카테고리 정보 가져오기 실패:', error);
     
@@ -146,75 +146,50 @@ export const fetchCategories = async () => {
  */
 export const fetchStoresByCategory = async (categoryCode) => {
   try {
-    // 실제 API가 준비되면 여기서 실제 API 호출
-    // const response = await fetch(`${API_BASE_URL}/stores?category=${categoryCode}`);
-    // const data = await response.json();
-    // return data.result;
+    // 실제 API 호출하여 카테고리별 스토어 필터링 (타임아웃 설정)
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10초 타임아웃
     
-    // 현재는 목데이터 반환 (카페 카테고리 기준)
-    if (categoryCode === 'cafe') {
-      return [
-        {
-          "id": 1,
-          "name": "스타벅스 관악서울대입구R점",
-          "address": "서울 관악구 관악로 158",
-          "latitude": 126.95280377997965,
-          "longitude": 37.47927529407993,
-          "phone": "02-1234-5678",
-          "category": "cafe",
-          "businessHoursJson": "{\"fri\": \"07:00-22:00\", \"mon\": \"07:00-22:00\", \"sat\": \"07:00-22:00\", \"sun\": \"07:00-22:00\", \"thu\": \"07:00-22:00\", \"tue\": \"07:00-22:00\", \"wed\": \"07:00-22:00\"}",
-          "startDate": "2025-08-01",
-          "endDate": "2025-09-30",
-          "status": "ACTIVE",
-          "partnershipId": 1,
-          "images": [
-            "https://heyoung.s3.ap-northeast-2.amazonaws.com/store_image.png",
-            "https://heyoung.s3.ap-northeast-2.amazonaws.com/store_image.png"
-          ]
-        },
-        {
-          "id": 2,
-          "name": "스타벅스 서울대입구역점",
-          "address": "서울 관악구 남부순환로 1812",
-          "latitude": 126.95135823610674,
-          "longitude": 37.48116232181828,
-          "phone": "02-1234-5678",
-          "category": "cafe",
-          "businessHoursJson": "{\"fri\": \"07:00-22:00\", \"mon\": \"07:00-22:00\", \"sat\": \"07:00-22:00\", \"sun\": \"07:00-22:00\", \"thu\": \"07:00-22:00\", \"tue\": \"07:00-22:00\", \"wed\": \"07:00-22:00\"}",
-          "startDate": "2025-08-01",
-          "endDate": "2025-09-30",
-          "status": "ACTIVE",
-          "partnershipId": 1,
-          "images": [
-            "https://heyoung.s3.ap-northeast-2.amazonaws.com/store_image.png",
-            "https://heyoung.s3.ap-northeast-2.amazonaws.com/store_image.png"
-          ]
-        },
-        {
-          "id": 3,
-          "name": "스타벅스 서울대입구역8번출구점",
-          "address": "서울 관악구 남부순환로 1831",
-          "latitude": 126.95365619637556,
-          "longitude": 37.4811767606375,
-          "phone": "02-1234-5678",
-          "category": "cafe",
-          "businessHoursJson": "{\"fri\": \"07:00-22:00\", \"mon\": \"07:00-22:00\", \"sat\": \"07:00-22:00\", \"sun\": \"07:00-22:00\", \"thu\": \"07:00-22:00\", \"tue\": \"07:00-22:00\", \"wed\": \"07:00-22:00\"}",
-          "startDate": "2025-08-01",
-          "endDate": "2025-09-30",
-          "status": "ACTIVE",
-          "partnershipId": 1,
-          "images": [
-            "https://heyoung.s3.ap-northeast-2.amazonaws.com/store_image.png",
-            "https://heyoung.s3.ap-northeast-2.amazonaws.com/store_image.png"
-          ]
-        }
-      ];
+    const response = await fetch(`${API_BASE_URL}/partnerships/university`, {
+      signal: controller.signal
+    });
+    
+    clearTimeout(timeoutId);
+    
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
     }
     
-    // 다른 카테고리는 빈 배열 반환
+    const data = await response.json();
+    
+    if (data.isSuccess && data.result) {
+      // 카테고리 코드에 맞는 파트너십들만 필터링
+      const categoryMapping = {
+        'cafe': 'CAFE',
+        'beauty': 'BEAUTY',
+        'convenience': 'CONVENIENCE STORE'
+      };
+      
+      const targetCategory = categoryMapping[categoryCode];
+      if (!targetCategory) return [];
+      
+      const filteredPartnerships = data.result.filter(
+        partnership => partnership.categoryName === targetCategory
+      );
+      
+      console.log(`카테고리 ${categoryCode} 파트너십 데이터 가져오기 성공:`, filteredPartnerships.length, '개');
+      return filteredPartnerships;
+    }
+    
     return [];
   } catch (error) {
-    console.error('카테고리별 스토어 정보 가져오기 실패:', error);
-    throw error;
+    if (error.name === 'AbortError') {
+      console.warn(`카테고리 ${categoryCode} 스토어 API 호출 타임아웃 - 빈 배열 반환`);
+    } else {
+      console.error('카테고리별 스토어 정보 가져오기 실패:', error);
+    }
+    
+    // API 실패 시 빈 배열 반환 (UI가 깨지지 않도록)
+    return [];
   }
 };

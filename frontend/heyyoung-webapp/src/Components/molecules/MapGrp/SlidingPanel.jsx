@@ -1,8 +1,54 @@
 import React, { useState, useRef, useEffect } from 'react';
 import styles from './MapView.module.css';
+import { StoreListItem } from '../ListItemBox/index';
 import { fetchStores } from '../../../services/api/stores';
 
-const SlidingPanel = () => {
+// API 데이터를 마커 형식으로 변환하는 함수 (MapView와 동일한 로직)
+const convertApiStoresToMarkers = (partnershipsData) => {
+  const markers = [];
+  
+  if (!partnershipsData || partnershipsData.length === 0) {
+    return markers;
+  }
+  
+  partnershipsData.forEach((partnership) => {
+    if (partnership.partnershipBranchDto && partnership.partnershipBranchDto.length > 0) {
+      partnership.partnershipBranchDto.forEach((branch) => {
+        // API 응답에서 latitude는 경도(126.xxx), longitude는 위도(37.xxx)
+        // 카카오맵은 (위도, 경도) 순서이므로 순서를 바꿔야 함
+        const lat = branch.longitude; // 위도
+        const lng = branch.latitude;  // 경도
+        
+        const marker = {
+          id: branch.id,
+          name: branch.name,
+          content: `${partnership.companyName} ${partnership.discountRate}% 할인`,
+          address: branch.address,
+          lat: lat,
+          lng: lng,
+          phone: branch.phone,
+          businessHoursJson: branch.businessHoursJson,
+          startDate: branch.startDate,
+          endDate: branch.endDate,
+          status: branch.status,
+          partnershipId: partnership.id,
+          companyName: partnership.companyName,
+          discountRate: partnership.discountRate,
+          discountAmount: partnership.discountAmount,
+          terms: partnership.terms,
+          category: partnership.categoryName?.toLowerCase(),
+          images: branch.images || []
+        };
+        
+        markers.push(marker);
+      });
+    }
+  });
+  
+  return markers;
+};
+
+const SlidingPanel = ({ currentLocation }) => {
   const [isSlidingPanelOpen, setIsSlidingPanelOpen] = useState(false);
   const [panelHeight, setPanelHeight] = useState(60);
   const [isDragging, setIsDragging] = useState(false);
@@ -11,44 +57,20 @@ const SlidingPanel = () => {
   const [stores, setStores] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [currentLocation, setCurrentLocation] = useState(null);
 
-  // 가게 정보와 현재 위치 가져오기
+  // 가게 정보 가져오기
   useEffect(() => {
-    const loadStoresAndLocation = async () => {
+    const loadStores = async () => {
       setIsLoading(true);
       setError(null);
       try {
         // 가게 정보 가져오기
-        const storesData = await fetchStores();
-        setStores(storesData);
-        console.log('가게 데이터 로드 완료:', storesData);
-
-        // 현재 위치 가져오기 (더 정확한 옵션)
-        if (navigator.geolocation) {
-          const options = {
-            enableHighAccuracy: true,  // 높은 정확도
-            timeout: 10000,           // 10초 타임아웃
-            maximumAge: 60000         // 1분 이내의 캐시된 위치 사용
-          };
-          
-          navigator.geolocation.getCurrentPosition(
-            (position) => {
-              const { latitude, longitude } = position.coords;
-              setCurrentLocation({ lat: latitude, lng: longitude });
-              console.log('현재 위치 가져오기 완료:', { lat: latitude, lng: longitude });
-            },
-            (error) => {
-              console.error('위치 가져오기 실패:', error);
-              // 서울대학교 위치를 기본값으로 설정
-              setCurrentLocation({ lat: 37.4592, lng: 126.9517 });
-            },
-            options
-          );
-        } else {
-          // 서울대학교 위치를 기본값으로 설정
-          setCurrentLocation({ lat: 37.4592, lng: 126.9517 });
-        }
+        const rawStoresData = await fetchStores();
+        // API 데이터를 마커 형식으로 변환
+        const convertedStores = convertApiStoresToMarkers(rawStoresData);
+        setStores(convertedStores);
+        console.log('원본 API 데이터:', rawStoresData);
+        console.log('변환된 가게 데이터:', convertedStores);
       } catch (err) {
         setError(err.message);
         console.error('가게 데이터 로드 실패:', err);
@@ -57,7 +79,7 @@ const SlidingPanel = () => {
       }
     };
 
-    loadStoresAndLocation();
+    loadStores();
   }, []);
 
   // 두 지점 간의 거리 계산 (Haversine 공식)
@@ -65,6 +87,12 @@ const SlidingPanel = () => {
     // 입력값 검증
     if (!lat1 || !lng1 || !lat2 || !lng2) {
       console.error('잘못된 좌표값:', { lat1, lng1, lat2, lng2 });
+      return 0;
+    }
+    
+    // currentLocation이 없으면 서울대학교 위치 사용
+    if (!currentLocation) {
+      console.log('currentLocation이 없어서 서울대학교 위치 사용');
       return 0;
     }
     
@@ -272,40 +300,37 @@ const SlidingPanel = () => {
               {isLoading ? (
                 <div className={styles.loadingMessage}>로딩 중...</div>
               ) : error ? (
-                <div className={styles.errorMessage}>에러: {error}</div>
+                <div className={styles.errorMessage}>API 연결 실패: {error}</div>
               ) : stores && stores.length > 0 && currentLocation ? (
                 stores
                   .map((store) => {
                     const distance = calculateDistance(
                       currentLocation.lat,
                       currentLocation.lng,
-                      store.latitude,
-                      store.longitude
+                      store.lat,
+                      store.lng
                     );
                     return { ...store, distance };
                   })
                   .sort((a, b) => a.distance - b.distance) // 거리순으로 정렬
                   .map((store, index) => (
-                    <div key={store.id} className={styles.listItem}>
-                      <div className={styles.storeHeader}>
-                        <h4>{store.name}</h4>
-                        <span className={styles.distanceBadge}>
-                          {formatDistance(store.distance)}
-                        </span>
-                      </div>
-                      <div className={styles.storeDetails}>
-                        <p className={styles.category}>
-                          카테고리: {store.category === 'cafe' ? '☕ 카페' : store.category}
-                        </p>
-                        <p className={styles.address}>{store.address}</p>
-                        {store.phone && (
-                          <p className={styles.phone}>📞 {store.phone}</p>
-                        )}
-                      </div>
-                    </div>
+                    <StoreListItem
+                      key={store.id}
+                      store={{
+                        ...store,
+                        distance: store.distance,
+                        businessHours: store.businessHoursJson ? JSON.parse(store.businessHoursJson) : null
+                      }}
+                      onItemClick={(clickedStore) => {
+                        console.log('스토어 클릭됨:', clickedStore);
+                        // 여기에 스토어 클릭 시 동작 추가
+                      }}
+                    />
                   ))
+              ) : stores && stores.length === 0 ? (
+                <div className={styles.emptyMessage}>주변에 제휴 매장이 없습니다.</div>
               ) : (
-                <div className={styles.emptyMessage}>가게 정보가 없습니다.</div>
+                <div className={styles.errorMessage}>데이터를 불러올 수 없습니다.</div>
               )}
             </div>
           </div>

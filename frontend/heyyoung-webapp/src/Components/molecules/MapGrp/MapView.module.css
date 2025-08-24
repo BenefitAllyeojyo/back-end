@@ -6,6 +6,13 @@
   margin: 0;
 }
 
+/* 카테고리 라벨 스타일 */
+.categoryLabel {
+  font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  pointer-events: none;
+  user-select: none;
+}
+
 .map {
   width: 100%;
   height: 700px;
