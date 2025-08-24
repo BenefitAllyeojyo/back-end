@@ -12,6 +12,7 @@ export { default as SearchBtn } from './SearchBtn';
 export { default as SquareWhiteBtn } from './SquareWhiteBtn';
 export { default as BigCardBtn } from './BigCardBtn';
 export { default as CharacterBtn } from './CharacterBtn';
+export { default as PayHeadButton } from './PayHeadButton';
 
 // Base 컴포넌트와 유틸리티
 export { ButtonBase } from './ButtonBase';
