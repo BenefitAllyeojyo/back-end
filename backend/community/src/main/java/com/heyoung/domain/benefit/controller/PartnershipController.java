@@ -31,4 +31,10 @@ public class PartnershipController {
         return BaseResponse.onSuccess(partnershipService.findPartnerships(memberId, category), ResponseCode.OK);
     }
 
+	@Operation(summary = "모든 카테고리 유형을 조회하는 API", description = "모든 카테고리 유형을 조회하는 API입니다.")
+	@GetMapping("/categories")
+	public BaseResponse<List<String>> getCategories() {
+		return BaseResponse.onSuccess(partnershipService.findAllCategories(), ResponseCode.OK);
+	}
+
 }

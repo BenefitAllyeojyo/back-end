@@ -40,7 +40,7 @@ public class PartnershipService {
         Long universityId = userUniversity.getUniversity().getId();
         List<Partnership> partnerships = partnershipRepository.findByUniversityId(universityId);
 
-		if(category == null){
+		if(category == null || category.isEmpty()) {
 			return partnerships.stream()
 				.map(PartnershipDto::new)
 				.collect(Collectors.toList());
@@ -51,4 +51,11 @@ public class PartnershipService {
 				.collect(Collectors.toList());
 		}
     }
+
+	@Transactional
+	public List<String> findAllCategories() {
+		return partnershipRepository.findAll().stream()
+			.map(partnership -> partnership.getCategory().getName())
+			.toList();
+	}
 }
