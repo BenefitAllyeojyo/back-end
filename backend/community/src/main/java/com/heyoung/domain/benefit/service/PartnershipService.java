@@ -34,13 +34,21 @@ public class PartnershipService {
 
     // 사용자 대학의 Partnership
     @Transactional(readOnly = true)
-    public List<PartnershipDto> findPartnerships(Long memberId) {
+    public List<PartnershipDto> findPartnerships(Long memberId, String category) {
         Optional<UserUniversity> userUniversityOptional = userUniversityRepository.findByUserId(memberId);
         UserUniversity userUniversity = userUniversityOptional.get();
         Long universityId = userUniversity.getUniversity().getId();
         List<Partnership> partnerships = partnershipRepository.findByUniversityId(universityId);
-        return partnerships.stream()
-                .map(PartnershipDto::new)
-                .collect(Collectors.toList());
+
+		if(category == null){
+			return partnerships.stream()
+				.map(PartnershipDto::new)
+				.collect(Collectors.toList());
+		} else {
+			return partnerships.stream()
+				.filter(p -> p.getCategory().getName().equals(category))
+				.map(PartnershipDto::new)
+				.collect(Collectors.toList());
+		}
     }
 }
