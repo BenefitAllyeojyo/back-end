@@ -11,11 +11,25 @@ import MiniTagBtn from '@/Components/atoms/Button/MiniTagBtn'
 import RegularButton from '@/Components/atoms/Button/RegularButton'
 import SearchBtn from '@/Components/atoms/Button/SearchBtn'
 import SquareWhiteBtn from '@/Components/atoms/Button/SquareWhiteBtn'
+import { Carousel } from '@/Components/molecules/Carousel'
 
 export default function ButtonExamplePage() {
   const handleClick = (buttonName) => {
     console.log(`${buttonName} 클릭됨!`)
   }
+
+  // 카루셀 테스트용 데이터
+  const carouselSlides = [
+    {
+      image: '/src/assets/images/carousel/carousel1.png',
+    },
+    {
+      image: '/src/assets/images/carousel/carousel2.png',
+    },
+    {
+      image: '/src/assets/images/carousel/carousel3.png',
+    }
+  ]
 
   return (
     <div style={{ 
@@ -23,7 +37,8 @@ export default function ButtonExamplePage() {
       maxWidth: '800px', 
       margin: '0 auto',
       background: 'var(--neutral-light-lightest)',
-      minHeight: '100vh'
+      minHeight: '100vh',
+      overflowY: 'auto'  // 세로 스크롤 추가
     }}>
       <h1 style={{ 
         color: 'var(--neutral-dark-darkest)', 
@@ -32,6 +47,16 @@ export default function ButtonExamplePage() {
       }}>
         버튼 컴포넌트 예제
       </h1>
+
+      {/* Carousel Component */}
+      <section style={{ marginBottom: '40px' }}>
+        <h2 style={{ color: 'var(--neutral-dark-darkest)', marginBottom: '20px' }}>
+          카루셀 컴포넌트 (Carousel)
+        </h2>
+        <div style={{ display: 'flex', justifyContent: 'center' }}>
+          <Carousel slides={carouselSlides} />
+        </div>
+      </section>
 
       {/* Basic Button */}
       <section style={{ marginBottom: '40px' }}>
