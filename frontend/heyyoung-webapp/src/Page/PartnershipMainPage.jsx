@@ -1,4 +1,5 @@
 import React from 'react'
+import { useNavigate } from 'react-router-dom'
 import BellButton from '../Components/atoms/Button/BellButton'
 import BackgroundBottomTabImage from '../Components/atoms/BackgroundBottomTabImage'
 import { SavingBox } from '../Components/molecules/TextGrp'
@@ -18,6 +19,12 @@ const mockPartnershipData = {
 }
 
 export default function PartnershipMainPage() {
+  const navigate = useNavigate()
+
+  const handleShopClick = () => {
+    navigate('/partnership/list')
+  }
+
   return (
     <div style={{ 
       position: 'relative', 
@@ -59,7 +66,7 @@ export default function PartnershipMainPage() {
           <ZoneBox 
             image="shop"
             text="실시간 추천 제휴 보기"
-            onClick={() => console.log('실시간 추천 제휴 클릭')}
+            onClick={handleShopClick}
           />
           <ZoneBox 
             image="map"

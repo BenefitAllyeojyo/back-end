@@ -13,7 +13,7 @@ export default function EntireMenuPage() {
 
   const handlePartnershipClick = () => {
     console.log('제휴존 배너 클릭됨!')
-    // 제휴존 클릭 시 동작 로직
+    navigate('/partnership')
   }
 
   return (
