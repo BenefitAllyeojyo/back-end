@@ -3,44 +3,43 @@ import { createRoot } from 'react-dom/client';
 import styles from './MapView.module.css';
 import ToolTipModule from '../../molecules/TextGrp/ToolTipModule';
 import LocationPin from '../../atoms/LocationPin';
-import { mapMarkers, mapCenter, mapConfig } from '../../../../public/mock/mapMarkers';
+import { stores, convertStoresToMarkers, mapConfig as defaultMapConfig } from '../../../mocks/stores';
+import { useStores } from '../../../hooks/useStores';
 
-const MapView = ({ schoolName = '성신여자대학교', schoolColor }) => {
+const MapView = ({ schoolName = '서울대학교', schoolColor }) => {
   const mapRef = useRef(null);
   const mapInstanceRef = useRef(null);
   const overlaysRef = useRef([]);         // ★ CustomOverlay 인스턴스 보관
   const [mapLoaded, setMapLoaded] = useState(false);
+  
+  // 커스텀 훅으로 스토어와 파트너십 데이터 가져오기
+  const { stores: apiStores, partnerships, isLoading, error } = useStores(1);
 
-  // mock 데이터 (여러 개의 마커)
-  const testMarkers = [
-    {
-      id: 1,
-      name: '테스트 가게 1',
-      content: '📍 테스트 가게입니다\n여러 줄 텍스트도 가능합니다',
-      address: '서울특별시 중구 테스트로 123',
-      isSchool: false,
-      lat: 37.5665,
-      lng: 126.9780
-    },
-    {
-      id: 2,
-      name: '테스트 가게 2',
-      content: '📍 두 번째 테스트 가게\n다양한 정보를 표시할 수 있어요',
-      address: '서울특별시 중구 테스트로 456',
-      isSchool: false,
-      lat: 37.5685,
-      lng: 126.9800
-    },
-    {
-      id: 3,
-      name: '테스트 가게 3',
-      content: '📍 세 번째 테스트 가게\n마커를 여러 개 추가했습니다',
-      address: '서울특별시 중구 테스트로 789',
-      isSchool: false,
-      lat: 37.5645,
-      lng: 126.9760
-    }
-  ];
+  // API 스토어 데이터를 마커 형식으로 변환
+  const convertApiStoresToMarkers = (storesData) => {
+    return storesData.map(store => ({
+      id: store.id,
+      position: {
+        lat: store.latitude,
+        lng: store.longitude
+      },
+      name: store.name,
+      content: `재학생 대상 음료 개당 500원 할인`,
+      address: store.address,
+      lat: store.latitude,
+      lng: store.longitude,
+      phone: store.phone,
+      businessHours: store.businessHoursJson ? JSON.parse(store.businessHoursJson) : null,
+      startDate: store.startDate,
+      endDate: store.endDate,
+      status: store.status,
+      partnershipId: store.partnershipId,
+      images: store.images
+    }));
+  };
+
+  // stores 데이터를 마커 형식으로 변환 (기존 목데이터)
+  const testMarkers = apiStores.length > 0 ? convertApiStoresToMarkers(apiStores) : convertStoresToMarkers(stores);
 
   useEffect(() => {
     let timer;
@@ -77,13 +76,13 @@ const MapView = ({ schoolName = '성신여자대학교', schoolColor }) => {
     try {
       const mapContainer = mapRef.current;
 
-      // 여러 마커의 중앙 좌표 계산
-      const centerLat = (37.5665 + 37.5685 + 37.5645) / 3;
-      const centerLng = (126.9780 + 126.9800 + 126.9760) / 3;
+      // 서울대입구역 중심 좌표 사용
+      const centerLat = defaultMapConfig.center.lat;
+      const centerLng = defaultMapConfig.center.lng;
       
       const mapOption = {
         center: new kakao.maps.LatLng(centerLat, centerLng),
-        level: 4, // 여러 마커를 모두 보기 위해 레벨 조정
+        level: defaultMapConfig.level, // 서울대입구역에 맞는 줌 레벨
         draggable: true,
         scrollwheel: true,
         disableDoubleClickZoom: false,
@@ -132,22 +131,33 @@ const MapView = ({ schoolName = '성신여자대학교', schoolColor }) => {
     }
   };
 
-     const addMapEventListeners = (map) => {
-     // 줌 변경 시 즉시 반응형 크기 조정
-     kakao.maps.event.addListener(map, 'zoom_changed', () => {
-       updateTooltipSizes(map);
-     });
+  const addMapEventListeners = (map) => {
+    // 줌 변경 시 즉시 반응형 크기 조정
+    kakao.maps.event.addListener(map, 'zoom_changed', () => {
+      updateTooltipSizes(map);
+    });
 
-     // 지도 중심 변경 시 즉시 반응형 크기 조정
-     kakao.maps.event.addListener(map, 'center_changed', () => {
-       updateTooltipSizes(map);
-     });
+    // 지도 중심 변경 시 즉시 반응형 크기 조정
+    kakao.maps.event.addListener(map, 'center_changed', () => {
+      updateTooltipSizes(map);
+    });
 
-     // 드래그 중에도 실시간으로 반응형 크기 조정
-     kakao.maps.event.addListener(map, 'drag', () => {
-       updateTooltipSizes(map);
-     });
+    // 드래그 중에도 실시간으로 반응형 크기 조정 (성능 최적화)
+    let dragTimeout;
+    kakao.maps.event.addListener(map, 'drag', () => {
+      clearTimeout(dragTimeout);
+      dragTimeout = setTimeout(() => {
+        updateTooltipSizes(map);
+      }, 50); // 드래그 중에는 50ms 딜레이로 제한
+    });
+    
+    // 드래그 종료 시 즉시 업데이트
+    kakao.maps.event.addListener(map, 'dragend', () => {
+      clearTimeout(dragTimeout);
+      updateTooltipSizes(map);
+    });
 
+    // 지도 클릭 시 모든 툴팁만 숨김 (마커는 유지)
     kakao.maps.event.addListener(map, 'click', () => {
       const currentLevel = map.getLevel();
       console.log(`현재 지도 레벨: ${currentLevel}`);
@@ -157,8 +167,8 @@ const MapView = ({ schoolName = '성신여자대학교', schoolColor }) => {
       
       // 모든 마커를 원래 상태로 복원 (색상만 변경)
       overlaysRef.current.forEach(item => {
-        if (item.setImage) {
-          item.setImage(defaultIcon);
+        if (item.setImage && item.defaultIcon) {
+          item.setImage(item.defaultIcon);
           item.setZIndex(1);
         }
       });
@@ -365,6 +375,9 @@ const MapView = ({ schoolName = '성신여자대학교', schoolColor }) => {
       zIndex: 1 // 기본 마커는 낮은 zIndex
     });
     
+    // 마커에 기본 아이콘 참조 저장 (지도 클릭 시 복원용)
+    marker.defaultIcon = defaultIcon;
+    
     console.log('커스텀 마커 생성 완료');
 
     // 2. ToolTipModule을 content로 사용 (초기에는 숨김)
@@ -373,16 +386,24 @@ const MapView = ({ schoolName = '성신여자대학교', schoolColor }) => {
     tooltipDiv.style.display = 'none'; // 초기에는 숨김
     tooltipDiv.style.zIndex = '9999'; // 마커보다 위에 표시
 
-    const tooltipRoot = createRoot(tooltipDiv);
-    tooltipRoot.render(
-      <ToolTipModule
-        name={markerData.name}
-        content={markerData.content}
-        address={markerData.address}
-        lat={markerData.lat}
-        lng={markerData.lng}
-      />
-    );
+            const tooltipRoot = createRoot(tooltipDiv);
+        tooltipRoot.render(
+          <ToolTipModule
+            name={markerData.name}
+            content={markerData.content}
+            address={markerData.address}
+            lat={markerData.lat}
+            lng={markerData.lng}
+            phone={markerData.phone}
+            businessHours={markerData.businessHours}
+            startDate={markerData.startDate}
+            endDate={markerData.endDate}
+            status={markerData.status}
+            partnershipId={markerData.partnershipId}
+            images={markerData.images}
+            partnerships={partnerships}
+          />
+        );
 
     // 3. 커스텀 오버레이 생성 (초기에는 숨김)
     const customOverlay = new kakao.maps.CustomOverlay({
@@ -430,6 +451,14 @@ const MapView = ({ schoolName = '성신여자대학교', schoolColor }) => {
         setTimeout(() => {
           console.log('지도 이동 시작...');
           centerMapForTooltip(currentMap, markerPosition);
+          
+          // 지도 이동 완료 후 드래그 기능 복원
+          setTimeout(() => {
+            if (currentMap && currentMap.setDraggable) {
+              currentMap.setDraggable(true);
+              console.log('지도 드래그 기능 복원됨');
+            }
+          }, 500);
         }, 100); // 툴팁 표시 후 100ms 뒤 지도 이동
         
         // 마진 재계산을 더 늦게 실행
@@ -477,7 +506,6 @@ const MapView = ({ schoolName = '성신여자대학교', schoolColor }) => {
         ref={mapRef}
         id="map"
         className={styles.map}
-        style={{ width: `${mapConfig.width}px`, height: `${mapConfig.height}px` }}
       />
       {mapLoaded && (
         <div className={styles.mapInfo}>
@@ -507,27 +535,10 @@ const MapView = ({ schoolName = '성신여자대학교', schoolColor }) => {
             </span>
           </div>
 
-          <div className={styles.locationList}>
-            <h4>📍 표시된 위치들:</h4>
-            <ul>
-              {testMarkers.map((marker) => (
-                <li key={marker.id} className={marker.isSchool ? styles.schoolItem : ''}>
-                  <strong>{marker.name}</strong>
-                  {marker.isSchool && <span className={styles.schoolBadge}>🏫 학교</span>}
-                  <div className={styles.benefitInfo}>
-                    {marker.content.split('\n').map((line, index) => (
-                      <div key={index} className={styles.benefitLine}>{line}</div>
-                    ))}
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </div>
-
         </div>
       )}
     </div>
   );
 };
-
 export default MapView;
+
