@@ -1,8 +1,8 @@
 import { MiniTagBtn } from '@/Components/atoms/Button'
 import styles from './ShopInfoTextModule.module.css'
 
+
 export default function ShopInfoTextModule({
-    label="카페",
     subTitle="캠퍼스 혜택, 전부 모았다!",
     Title="교내 제휴사업을\n내 손 안에!",
   }) {

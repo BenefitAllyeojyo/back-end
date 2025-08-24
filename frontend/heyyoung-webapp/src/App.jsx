@@ -10,7 +10,7 @@ import NotFound from './Page/NotFound'
 // TODO: 새로운 제휴 페이지들 import 예정
 // import PartnershipMainPage from './Page/PartnershipMainPage'
 // import PartnershipMapPage from './Page/PartnershipMapPage'
-// import PartnershipListPage from './Page/PartnershipListPage'
+import PartnershipListPage from './Page/PartnershipListPage'
 // import PartnershipDetailPage from './Page/PartnershipDetailPage'
 import PaymentPage from './Page/PaymentPage'
 import './App.css'
@@ -29,7 +29,7 @@ function App() {
           {/* TODO: 새로운 제휴 페이지 라우트 예정 */}
           {/* <Route path="/partnership" element={<PartnershipMainPage />} /> */}
           {/* <Route path="/partnership/map" element={<PartnershipMapPage />} /> */}
-          {/* <Route path="/partnership/list" element={<PartnershipListPage />} /> */}
+          <Route path="/partnership/list" element={<PartnershipListPage />} />
           {/* <Route path="/partnership/detail/:id" element={<PartnershipDetailPage />} /> */}
           <Route path="/payment" element={<PaymentPage />} />
           <Route path="*" element={<NotFound />} />
