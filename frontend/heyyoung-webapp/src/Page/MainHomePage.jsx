@@ -33,7 +33,7 @@ export default function MainHomePage() {
 
 
         {/* 메인 이미지 위에 오버레이 배너 */}
-        <div style={{
+        {/* <div style={{
           position: 'absolute',
           top: '57%',
           left: '50%',
@@ -51,7 +51,7 @@ export default function MainHomePage() {
               border: '1px solid rgba(116, 53, 253, 0.2)'
             }}
           />
-        </div>
+        </div> */}
       </div>
 
       {/* 하단 탭 이미지 - AppShell 컨테이너 하단에 고정 */}
