@@ -2,13 +2,13 @@ import { useState } from 'react'
 import styles from './MiniSelectBtn.module.css'
 
 export default function MiniSelectBtn({
-  label, onClick, disabled = false
+  label, onClick, disabled = false, isSelected = false
 }) {
   const [isHovered, setIsHovered] = useState(false)
 
   const buttonClasses = [
     styles.miniSelectButton,
-    isHovered && !disabled ? styles.hovered : styles.normal
+    isSelected ? styles.selected : (isHovered && !disabled ? styles.hovered : styles.normal)
   ].join(' ')
 
   return (

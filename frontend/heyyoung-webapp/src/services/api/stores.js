@@ -1,31 +1,4 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-const PARTNERSHIPS_ENDPOINT = '/partnerships/university';
-
-/**
- * 대학 파트너십 정보를 가져오는 API
- * @param {number} memberId - 회원 ID
- * @returns {Promise<Object>} 파트너십 정보
- */
-export const fetchPartnerships = async (memberId = 1) => {
-  try {
-    const response = await fetch(`${API_BASE_URL}${PARTNERSHIPS_ENDPOINT}?memberId=${memberId}`);
-    
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    
-    const data = await response.json();
-    
-    if (!data.isSuccess) {
-      throw new Error(`API error: ${data.message}`);
-    }
-    
-    return data.result;
-  } catch (error) {
-    console.error('파트너십 정보 가져오기 실패:', error);
-    throw error;
-  }
-};
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://api.brainpix.net';
 
 /**
  * 스토어 정보를 가져오는 API (현재는 목데이터 반환)
@@ -47,6 +20,7 @@ export const fetchStores = async () => {
         "latitude": 126.95280377997965,
         "longitude": 37.47927529407993,
         "phone": "02-1234-5678",
+        "category": "cafe",
         "businessHoursJson": "{\"fri\": \"07:00-22:00\", \"mon\": \"07:00-22:00\", \"sat\": \"07:00-22:00\", \"sun\": \"07:00-22:00\", \"thu\": \"07:00-22:00\", \"tue\": \"07:00-22:00\", \"wed\": \"07:00-22:00\"}",
         "startDate": "2025-08-01",
         "endDate": "2025-09-30",
@@ -64,6 +38,7 @@ export const fetchStores = async () => {
         "latitude": 126.95135823610674,
         "longitude": 37.48116232181828,
         "phone": "02-1234-5678",
+        "category": "cafe",
         "businessHoursJson": "{\"fri\": \"07:00-22:00\", \"mon\": \"07:00-22:00\", \"sat\": \"07:00-22:00\", \"sun\": \"07:00-22:00\", \"thu\": \"07:00-22:00\", \"tue\": \"07:00-22:00\", \"wed\": \"07:00-22:00\"}",
         "startDate": "2025-08-01",
         "endDate": "2025-09-30",
@@ -81,6 +56,7 @@ export const fetchStores = async () => {
         "latitude": 126.95365619637556,
         "longitude": 37.4811767606375,
         "phone": "02-1234-5678",
+        "category": "cafe",
         "businessHoursJson": "{\"fri\": \"07:00-22:00\", \"mon\": \"07:00-22:00\", \"sat\": \"07:00-22:00\", \"sun\": \"07:00-22:00\", \"thu\": \"07:00-22:00\", \"tue\": \"07:00-22:00\", \"wed\": \"07:00-22:00\"}",
         "startDate": "2025-08-01",
         "endDate": "2025-09-30",

@@ -65,7 +65,7 @@ export const mapConfig = {
   level: 4,
   schoolName: '서울대학교',
   width: 800,
-  height: 600
+  height: 1200
 };
 
 // 스토어 데이터를 MapView에서 사용할 수 있는 형식으로 변환

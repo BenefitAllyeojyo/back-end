@@ -2,28 +2,29 @@
   position: relative;
   width: 100%;
   height: 100%;
+  padding: 0;
+  margin: 0;
 }
 
 .map {
-  width: 800px;
-  height: 600px;
+  width: 100%;
+  height: 700px;
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   overflow: hidden;
 }
 
-/* 반응형 높이 조정 */
 @media (max-width: 768px) {
   .map {
     width: 100%;
-    height: 400px;
+    height: 700px;
   }
 }
 
 @media (max-width: 480px) {
   .map {
     width: 100%;
-    height: 300px;
+    height: 600px;
   }
 }
 
@@ -70,6 +71,146 @@
   cursor: pointer;
 }
 .refreshInfo { font-size: 12px; color: #6b7280; }
+
+/* 카테고리 컨테이너 */
+.categoryContainer {
+  position: absolute;
+  top: 20px;
+  left: 25%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 12px;
+  z-index: 1000;
+  padding: 8px;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 12px;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* 지도 액션 버튼들은 MapActionButton 컴포넌트에서 관리됩니다 */
+
+/* CharacterBtn과 위성 버튼들 */
+.characterButtonContainer {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  z-index: 1000;
+  transition: bottom 0.3s ease;
+}
+
+/* GPT 입력창이 표시될 때 CharacterBtn을 위로 이동 */
+.characterButtonContainer.withGptInput {
+  bottom: 120px;
+}
+
+/* CharacterBtn 스타일 */
+.characterButtonContainer > :last-child {
+  position: relative;
+  z-index: 1001;
+}
+
+.satelliteButton {
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  cursor: pointer;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  opacity: 0; /* 초기에는 숨김 */
+}
+
+/* 위성 버튼 위치 설정 */
+.satelliteButton:nth-child(1) {
+  /* 챗봇 버튼 - 왼쪽 */
+  left: -60px;
+  top: 50%;
+  transform: translateY(-50%);
+  animation-delay: 0s; /* 첫 번째로 나타남 */
+}
+
+.satelliteButton:nth-child(2) {
+  /* 학교 위치 버튼 - 왼쪽 위 대각선 */
+  left: -50px;
+  top: -50px;
+  animation-delay: 0.2s; /* 두 번째로 나타남 */
+}
+
+.satelliteButton:nth-child(3) {
+  /* 내 위치 버튼 - 위 */
+  left: 50%;
+  top: -60px;
+  transform: translateX(-50%);
+  animation-delay: 0.4s; /* 세 번째로 나타남 */
+}
+
+.satelliteButton:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+}
+
+.satelliteButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+@keyframes satelliteAppear {
+  0% {
+    opacity: 0;
+    transform: scale(0.3) rotate(0deg);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(0.8) rotate(180deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(360deg);
+  }
+}
+
+/* 각 위성별로 다른 애니메이션 효과 */
+.satelliteButton:nth-child(1) {
+  animation: satelliteAppear 0.6s ease-out 0s both;
+}
+
+.satelliteButton:nth-child(2) {
+  animation: satelliteAppear 0.6s ease-out 0.2s both;
+}
+
+.satelliteButton:nth-child(3) {
+  animation: satelliteAppear 0.6s ease-out 0.4s both;
+}
+
+/* GPT 입력창 */
+.gptInputContainer {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90%;
+  max-width: 600px;
+  z-index: 1000;
+  animation: gptInputAppear 0.3s ease-out;
+}
+
+@keyframes gptInputAppear {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
 
 .locationList { padding: 8px 10px; border-radius: 10px; background: #ffffffcc; backdrop-filter: blur(6px); box-shadow: 0 1px 4px rgba(0,0,0,.08); }
 .locationList ul { margin: 6px 0 0; padding-left: 16px; }

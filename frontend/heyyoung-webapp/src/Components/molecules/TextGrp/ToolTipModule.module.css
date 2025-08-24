@@ -80,7 +80,7 @@
 
 .TipContainer {
   position: absolute;
-  left: 20px; /* 툴팁 왼쪽에서 20px 떨어진 위치 */
-  bottom: -20px; /* 툴팁 아래쪽으로 20px 떨어진 위치 */
+  left: 15px; /* 툴팁 왼쪽에서 15px 떨어진 위치 (더 가깝게) */
+  bottom: -20px; /* 툴팁 아래쪽으로 15px 떨어진 위치 (더 가깝게) */
   z-index: 1;
 }

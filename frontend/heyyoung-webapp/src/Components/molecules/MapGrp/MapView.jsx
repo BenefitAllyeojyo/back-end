@@ -3,19 +3,82 @@ import { createRoot } from 'react-dom/client';
 import styles from './MapView.module.css';
 import ToolTipModule from '../../molecules/TextGrp/ToolTipModule';
 import LocationPin from '../../atoms/LocationPin';
+import { MapActionButton } from '../../atoms/Button';
+import { MiniSelectBtn } from '../../atoms/Button';
+import CharacterBtn from '../../atoms/Button/CharacterBtn';
+import GptInput from '../../atoms/Input/GptInput';
 import { stores, convertStoresToMarkers, mapConfig as defaultMapConfig } from '../../../mocks/stores';
 import { useStores } from '../../../hooks/useStores';
+import { fetchCategories, fetchStoresByCategory } from '../../../services/api';
 
 const MapView = ({ schoolName = '서울대학교', schoolColor }) => {
   const mapRef = useRef(null);
   const mapInstanceRef = useRef(null);
-  const overlaysRef = useRef([]);         // ★ CustomOverlay 인스턴스 보관
+  const overlaysRef = useRef([]); 
   const [mapLoaded, setMapLoaded] = useState(false);
+  const [locationLoading, setLocationLoading] = useState(false);
+  const [locationError, setLocationError] = useState(null);
+  const [categories, setCategories] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState('');
+  const [showSatelliteButtons, setShowSatelliteButtons] = useState(false);
+  const [showGptInput, setShowGptInput] = useState(false);
   
   // 커스텀 훅으로 스토어와 파트너십 데이터 가져오기
   const { stores: apiStores, partnerships, isLoading, error } = useStores(1);
 
-  // API 스토어 데이터를 마커 형식으로 변환
+  // 카테고리 데이터 로딩
+  useEffect(() => {
+    const loadCategories = async () => {
+      try {
+        const categoriesData = await fetchCategories();
+        setCategories(categoriesData);
+        
+        // 첫 번째 카테고리를 기본 선택
+        if (categoriesData.length > 0 && !selectedCategory) {
+          setSelectedCategory(categoriesData[0].code);
+        }
+      } catch (error) {
+        console.error('카테고리 로딩 실패:', error);
+      }
+    };
+
+    loadCategories();
+  }, [selectedCategory]);
+
+  // 카테고리 변경 시 스토어 데이터 업데이트
+  const handleCategoryChange = async (categoryCode) => {
+    setSelectedCategory(categoryCode);
+    
+    try {
+      const storesData = await fetchStoresByCategory(categoryCode);
+      // 여기서 스토어 데이터를 업데이트하고 마커를 다시 그릴 수 있습니다
+      console.log('카테고리 변경:', categoryCode, '스토어:', storesData);
+    } catch (error) {
+      console.error('카테고리별 스토어 로딩 실패:', error);
+    }
+  };
+
+  // CharacterBtn 클릭 핸들러
+  const handleCharacterClick = () => {
+    setShowSatelliteButtons(!showSatelliteButtons);
+    setShowGptInput(false); // 위성 버튼 토글 시 GPT 입력창 숨김
+  };
+
+  // 챗봇 버튼 클릭 핸들러
+  const handleChatbotClick = () => {
+    setShowGptInput(!showGptInput);
+    setShowSatelliteButtons(false); // GPT 입력창 표시 시 위성 버튼들 숨김
+  };
+
+  // 위치 버튼들 클릭 핸들러
+  const handleLocationClick = () => {
+    moveToCurrentLocation();
+  };
+
+  const handleSchoolClick = () => {
+    moveToSchool();
+  };
+
   const convertApiStoresToMarkers = (storesData) => {
     return storesData.map(store => ({
       id: store.id,
@@ -216,12 +279,14 @@ const MapView = ({ schoolName = '서울대학교', schoolColor }) => {
       tooltip.style.transform = `scale(${scaleFactor})`;
       tooltip.style.transformOrigin = 'top left'; // 왼쪽 위 기준으로 크기 조정
       
-      // 툴팁 높이만큼 위로 이동 (핀과 겹치지 않도록)
+      // 툴팁 높이만큼 위로 이동 + 왼쪽으로도 살짝 이동 (핀과 겹치지 않도록)
       const tooltipHeight = tooltip.offsetHeight || 100; // 기본값 설정
       const scaledHeight = tooltipHeight * scaleFactor;
-      const dynamicMarginTop = `-${scaledHeight + 10}px`; // 10px 여유 공간 추가
+      const dynamicMarginTop = `-${scaledHeight + 45}px`; // 15px 여유 공간 추가
+      const dynamicMarginLeft = `-30px`; // 왼쪽으로 20px 이동
       
       tooltip.style.marginTop = dynamicMarginTop;
+      tooltip.style.marginLeft = dynamicMarginLeft;
       
       // 내부 텍스트 크기도 조정 (애니메이션 효과 없음)
       const titleEls = tooltip.querySelectorAll('.ToolTipModuleTitle');
@@ -277,27 +342,95 @@ const MapView = ({ schoolName = '서울대학교', schoolColor }) => {
     console.log('다른 툴팁들 숨김');
   };
 
-  // 핀 오른쪽으로 중심 이동하여 툴팁이 완전히 보이도록 하는 함수
+  // 학교로 지도 이동하는 함수
+  const moveToSchool = () => {
+    if (!mapInstanceRef.current) return;
+    
+    // 기본 학교 위치 (서울대학교)
+    const schoolLocation = new kakao.maps.LatLng(
+      defaultMapConfig.center.lat,
+      defaultMapConfig.center.lng
+    );
+    
+    // 지도를 학교 위치로 이동
+    mapInstanceRef.current.setCenter(schoolLocation);
+    mapInstanceRef.current.setLevel(defaultMapConfig.level);
+    
+    console.log('학교 위치로 이동 완료:', schoolLocation.getLat(), schoolLocation.getLng());
+  };
+
+  // 현재 위치로 지도 이동하는 함수
+  const moveToCurrentLocation = () => {
+    if (!mapInstanceRef.current) return;
+    
+    setLocationLoading(true);
+    setLocationError(null);
+    
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          const currentLocation = new kakao.maps.LatLng(latitude, longitude);
+          
+          // 지도를 현재 위치로 이동
+          mapInstanceRef.current.setCenter(currentLocation);
+          mapInstanceRef.current.setLevel(3); // 적절한 줌 레벨로 설정
+          
+          console.log('현재 위치로 이동 완료:', latitude, longitude);
+          setLocationLoading(false);
+        },
+        (error) => {
+          console.error('위치 정보 가져오기 실패:', error);
+          setLocationError('위치 정보를 가져올 수 없습니다.');
+          setLocationLoading(false);
+          
+          // 에러 메시지 표시
+          setTimeout(() => {
+            setLocationError(null);
+          }, 3000);
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 60000
+        }
+      );
+    } else {
+      setLocationError('이 브라우저는 위치 정보를 지원하지 않습니다.');
+      setLocationLoading(false);
+      
+      setTimeout(() => {
+        setLocationError(null);
+      }, 3000);
+    }
+  };
+
+  // 핀 오른쪽 아래로 중심 이동하여 툴팁이 완전히 보이도록 하는 함수
   const centerMapForTooltip = (map, markerPosition) => {
     const currentCenter = map.getCenter();
     const currentLevel = map.getLevel();
     
     // 줌 레벨에 따라 이동 거리 조정 (레벨이 클수록 더 많이 이동)
     let offsetX = 0;
+    let offsetY = 0;
     if (currentLevel <= 3) {
       offsetX = 0.001; // 매우 확대된 상태
+      offsetY = 0.002; // 위도 방향으로 더 아래로
     } else if (currentLevel <= 6) {
       offsetX = 0.002; // 확대된 상태
+      offsetY = 0.003; // 위도 방향으로 더 아래로
     } else if (currentLevel <= 9) {
       offsetX = 0.003; // 보통 상태
+      offsetY = 0.004; // 위도 방향으로 더 아래로
     } else {
       offsetX = 0.004; // 축소된 상태
+      offsetY = 0.005; // 위도 방향으로 더 아래로
     }
     
-    // 핀 오른쪽으로 중심 이동
+    // 핀 오른쪽 아래로 중심 이동
     const newCenter = new kakao.maps.LatLng(
-      markerPosition.getLat(),
-      markerPosition.getLng() + offsetX
+      markerPosition.getLat() + offsetY, // 위도는 증가하면 아래로 이동
+      markerPosition.getLng() + offsetX  // 경도는 증가하면 오른쪽으로 이동
     );
     
     console.log('지도 이동 시작...');
@@ -502,41 +635,78 @@ const MapView = ({ schoolName = '서울대학교', schoolColor }) => {
 
   return (
     <div className={styles.mapContainer}>
+      {/* 카테고리 버튼들 */}
+      {mapLoaded && categories.length > 0 && (
+        <div className={styles.categoryContainer}>
+          {categories.map((category) => (
+            <MiniSelectBtn
+              key={category.id}
+              label={category.displayName}
+              isSelected={selectedCategory === category.code}
+              onClick={() => handleCategoryChange(category.code)}
+            />
+          ))}
+        </div>
+      )}
+      
       <div
         ref={mapRef}
         id="map"
         className={styles.map}
       />
+      
+      {/* CharacterBtn과 위성 버튼들 */}
       {mapLoaded && (
-        <div className={styles.mapInfo}>
-          <h3>🏫 {schoolName} 주변 지도</h3>
-          <p>{schoolName} 주변의 다양한 가게들과 편의시설을 확인할 수 있습니다!</p>
-
-          <div className={styles.refreshControls}>
-            <button
-              onClick={() => mapInstanceRef.current && refreshOverlays(mapInstanceRef.current)}
-              className={styles.refreshButton}
-            >
-              🔄 툴팁 새로고침
-            </button>
-            <button
-              onClick={() => {
-                if (mapInstanceRef.current) {
-                  addTooltipOverlays(mapInstanceRef.current);
-                }
-              }}
-              className={styles.refreshButton}
-              style={{ marginLeft: '10px' }}
-            >
-              🎯 툴팁 강제 추가
-            </button>
-            <span className={styles.refreshInfo}>
-              지도 이동/확대 시 자동으로 핀이 재렌더링됩니다
-            </span>
-          </div>
-
+        <div className={`${styles.characterButtonContainer} ${showGptInput ? styles.withGptInput : ''}`}>
+          {/* 위성 버튼들 */}
+          {showSatelliteButtons && (
+            <>
+              {/* 챗봇 버튼 */}
+              <button
+                className={styles.satelliteButton}
+                onClick={handleChatbotClick}
+                title="챗봇과 대화하기"
+              >
+                💬
+              </button>
+              
+              {/* 학교 위치 버튼 */}
+              <button
+                className={styles.satelliteButton}
+                onClick={handleSchoolClick}
+                title="학교 위치로 이동"
+              >
+                🏫
+              </button>
+              
+              {/* 내 위치 버튼 */}
+              <button
+                className={styles.satelliteButton}
+                onClick={handleLocationClick}
+                title={locationError || '내 위치로 이동'}
+                disabled={locationLoading}
+              >
+                {locationLoading ? '⏳' : locationError ? '❌' : '📍'}
+              </button>
+            </>
+          )}
+          
+          {/* 메인 CharacterBtn */}
+          <CharacterBtn
+            imageUrl="/src/assets/images/character/PLI_Face.png"
+            onClick={handleCharacterClick}
+            alt="플리"
+          />
         </div>
       )}
+
+      {/* GPT 입력창 */}
+      {showGptInput && (
+        <div className={styles.gptInputContainer}>
+          <GptInput />
+        </div>
+      )}
+    
     </div>
   );
 };
