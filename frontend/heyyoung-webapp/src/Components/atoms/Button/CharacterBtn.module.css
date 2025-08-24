@@ -10,6 +10,8 @@
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   font-size: 32px;
   color: white;
+  background: #542BA8; /* 보라색 배경 */
+  box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
 }
 
 .characterButton:not(:disabled) {
@@ -22,13 +24,14 @@
 }
 
 .hasImage {
-  background-size: cover;
-  background-position: 50% 50%;
+  background-size: 60%;
+  background-position: center;
   background-repeat: no-repeat;
+  background-color: #7C3AED; /* 보라색 배경 유지 */
 }
 
 .noImage {
-  background: var(--color-highlight);
+  background: #7C3AED; /* 보라색 배경 유지 */
 }
 
 .characterButton:active:not(:disabled) {

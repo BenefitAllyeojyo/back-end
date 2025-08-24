@@ -22,6 +22,11 @@ const MapView = ({ schoolName = '서울대학교', schoolColor }) => {
   const [selectedCategory, setSelectedCategory] = useState('');
   const [showSatelliteButtons, setShowSatelliteButtons] = useState(false);
   const [showGptInput, setShowGptInput] = useState(false);
+  const [isSlidingPanelOpen, setIsSlidingPanelOpen] = useState(false);
+  const [panelHeight, setPanelHeight] = useState(60); // 패널 높이 상태
+  const [isDragging, setIsDragging] = useState(false); // 드래그 상태
+  const [dragStartHeight, setDragStartHeight] = useState(60); // 드래그 시작 높이
+  const currentPanelHeight = useRef(60); // 실시간 높이 추적용 ref
   
   // 커스텀 훅으로 스토어와 파트너십 데이터 가져오기
   const { stores: apiStores, partnerships, isLoading, error } = useStores(1);
@@ -77,6 +82,155 @@ const MapView = ({ schoolName = '서울대학교', schoolColor }) => {
 
   const handleSchoolClick = () => {
     moveToSchool();
+  };
+
+  // 슬라이딩 패널 드래그 관련 함수들
+  const handleMouseDown = (e) => {
+    e.preventDefault();
+    console.log('마우스 다운 - 드래그 시작');
+    setIsDragging(true);
+    setDragStartHeight(panelHeight);
+    currentPanelHeight.current = panelHeight;
+    const startY = e.clientY;
+    let hasMoved = false;
+    
+    const handleMouseMove = (e) => {
+      const deltaY = startY - e.clientY;
+      if (Math.abs(deltaY) > 5) {
+        hasMoved = true;
+      }
+      const newHeight = Math.max(60, Math.min(460, dragStartHeight + deltaY));
+      currentPanelHeight.current = newHeight;
+      setPanelHeight(newHeight);
+      console.log('드래그 중 - 높이:', newHeight, 'deltaY:', deltaY);
+    };
+    
+    const handleMouseUp = () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+      setIsDragging(false);
+      
+      const finalHeight = currentPanelHeight.current;
+      console.log('드래그 완료 - 최종 높이:', finalHeight, 'dragStartHeight:', dragStartHeight, 'hasMoved:', hasMoved);
+      
+      // 사용자가 의도적으로 드래그한 경우 현재 위치에 고정
+      if (hasMoved && Math.abs(finalHeight - dragStartHeight) > 10) {
+        // 드래그가 10px 이상 움직였으면 의도적인 드래그로 간주
+        // 현재 드래그한 위치에 그대로 고정
+        console.log('의도적 드래그 - 현재 위치 유지:', finalHeight);
+        setPanelHeight(finalHeight);
+        if (finalHeight > 250) {
+          setIsSlidingPanelOpen(true);
+        } else {
+          setIsSlidingPanelOpen(false);
+        }
+      } else if (!hasMoved) {
+        // 드래그가 없었으면 클릭으로 간주하여 토글
+        console.log('클릭으로 간주 - 패널 토글');
+        handlePanelToggle();
+      } else {
+        // 드래그가 거의 없었으면 원래 위치로 복귀
+        console.log('우발적 터치 - 원래 위치로 복귀:', dragStartHeight);
+        setPanelHeight(dragStartHeight);
+      }
+    };
+    
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+  };
+
+  // 버튼 클릭 시 스르륵 애니메이션
+  const handlePanelToggle = () => {
+    if (isSlidingPanelOpen) {
+      // 열린 상태면 닫기 (60px로 스르륵)
+      animatePanelHeight(panelHeight, 60);
+      setIsSlidingPanelOpen(false);
+    } else {
+      // 닫힌 상태면 열기 (460px로 스르륵)
+      animatePanelHeight(panelHeight, 460);
+      setIsSlidingPanelOpen(true);
+    }
+  };
+
+  // 패널 높이 애니메이션 함수
+  const animatePanelHeight = (fromHeight, toHeight) => {
+    const duration = 500; // 0.5초
+    const startTime = Date.now();
+    const startHeight = fromHeight;
+    
+    const animate = () => {
+      const elapsed = Date.now() - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      
+      // easeInOut 효과
+      const easeProgress = progress < 0.5 
+        ? 2 * progress * progress 
+        : 1 - Math.pow(-2 * progress + 2, 2) / 2;
+      
+      const currentHeight = startHeight + (toHeight - startHeight) * easeProgress;
+      setPanelHeight(currentHeight);
+      
+      if (progress < 1) {
+        requestAnimationFrame(animate);
+      }
+    };
+    
+    animate();
+  };
+
+  const handleTouchStart = (e) => {
+    const touch = e.touches[0];
+    console.log('터치 시작 - 드래그 시작');
+    setIsDragging(true);
+    setDragStartHeight(panelHeight);
+    currentPanelHeight.current = panelHeight;
+    const startY = touch.clientY;
+    let hasMoved = false;
+    
+    const handleTouchMove = (e) => {
+      const touch = e.touches[0];
+      const deltaY = startY - touch.clientY;
+      if (Math.abs(deltaY) > 5) {
+        hasMoved = true;
+      }
+      const newHeight = Math.max(60, Math.min(460, dragStartHeight + deltaY));
+      currentPanelHeight.current = newHeight;
+      setPanelHeight(newHeight);
+      console.log('터치 드래그 중 - 높이:', newHeight, 'deltaY:', deltaY);
+    };
+    
+    const handleTouchEnd = () => {
+      document.removeEventListener('touchmove', handleTouchMove);
+      document.removeEventListener('touchend', handleTouchEnd);
+      setIsDragging(false);
+      
+      const finalHeight = currentPanelHeight.current;
+      console.log('터치 드래그 완료 - 최종 높이:', finalHeight, 'dragStartHeight:', dragStartHeight, 'hasMoved:', hasMoved);
+      
+      // 사용자가 의도적으로 드래그한 경우 현재 위치에 고정
+      if (hasMoved && Math.abs(finalHeight - dragStartHeight) > 10) {
+        // 드래그가 10px 이상 움직였으면 의도적인 드래그로 간주
+        // 현재 드래그한 위치에 그대로 고정
+        console.log('의도적 터치 드래그 - 현재 위치 유지:', finalHeight);
+        setPanelHeight(finalHeight);
+        if (finalHeight > 250) {
+          setIsSlidingPanelOpen(true);
+        } else {
+          setIsSlidingPanelOpen(false);
+        }
+      } else if (!hasMoved) {
+        // 드래그가 없었으면 클릭으로 간주하여 토글
+        console.log('클릭으로 간주 - 패널 토글');
+        handlePanelToggle();
+      } else {
+        // 드래그가 거의 없었으면 원래 위치로 복귀
+        console.log('우발적 터치 - 원래 위치로 복귀:', dragStartHeight);
+        setPanelHeight(dragStartHeight);
+      }
+    };
+    
+    document.addEventListener('touchmove', handleTouchMove);
+    document.addEventListener('touchend', handleTouchEnd);
   };
 
   const convertApiStoresToMarkers = (storesData) => {
@@ -703,9 +857,41 @@ const MapView = ({ schoolName = '서울대학교', schoolColor }) => {
       {/* GPT 입력창 */}
       {showGptInput && (
         <div className={styles.gptInputContainer}>
-          <GptInput />
+          <GptInput placeholder="주변에 제휴 가능한 카페 있으면 알려줘!"/>
         </div>
       )}
+
+      {/* 슬라이딩 패널 */}
+              <div 
+          className={styles.slidingPanel} 
+          style={{ 
+            height: `${panelHeight}px`,
+            transition: isDragging ? 'none' : 'none' // 애니메이션은 JavaScript로 처리
+          }}
+        >
+        <div 
+          className={styles.slidingPanelHandle} 
+          onMouseDown={handleMouseDown}
+          onTouchStart={handleTouchStart}
+        >
+          <div className={styles.handleIcon}>
+            {isSlidingPanelOpen ? '▼' : '▲'}
+          </div>
+        </div>
+        {panelHeight > 60 && (
+          <div className={styles.slidingPanelContent}>
+            {/* 여기에 목록 내용을 담을 수 있습니다 */}
+            <div className={styles.panelHeader}>
+              <h3>목록</h3>
+            </div>
+            <div className={styles.panelList}>
+              <div className={styles.listItem}>목록 항목 1</div>
+              <div className={styles.listItem}>목록 항목 2</div>
+              <div className={styles.listItem}>목록 항목 3</div>
+            </div>
+          </div>
+        )}
+      </div>
     
     </div>
   );

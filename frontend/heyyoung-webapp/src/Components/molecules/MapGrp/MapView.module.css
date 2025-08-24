@@ -76,7 +76,7 @@
 .categoryContainer {
   position: absolute;
   top: 20px;
-  left: 25%;
+  left: 50%;
   transform: translateX(-50%);
   display: flex;
   gap: 12px;
@@ -101,7 +101,7 @@
 
 /* GPT 입력창이 표시될 때 CharacterBtn을 위로 이동 */
 .characterButtonContainer.withGptInput {
-  bottom: 120px;
+  bottom: 80px;
 }
 
 /* CharacterBtn 스타일 */
@@ -130,7 +130,7 @@
 /* 위성 버튼 위치 설정 */
 .satelliteButton:nth-child(1) {
   /* 챗봇 버튼 - 왼쪽 */
-  left: -60px;
+  left: -45px;
   top: 50%;
   transform: translateY(-50%);
   animation-delay: 0s; /* 첫 번째로 나타남 */
@@ -138,15 +138,15 @@
 
 .satelliteButton:nth-child(2) {
   /* 학교 위치 버튼 - 왼쪽 위 대각선 */
-  left: -50px;
-  top: -50px;
+  left: -35px;
+  top: -35px;
   animation-delay: 0.2s; /* 두 번째로 나타남 */
 }
 
 .satelliteButton:nth-child(3) {
   /* 내 위치 버튼 - 위 */
   left: 50%;
-  top: -60px;
+  top: -45px;
   transform: translateX(-50%);
   animation-delay: 0.4s; /* 세 번째로 나타남 */
 }
@@ -193,7 +193,7 @@
 .gptInputContainer {
   position: absolute;
   bottom: 20px;
-  left: 50%;
+  left: 47%;
   transform: translateX(-50%);
   width: 90%;
   max-width: 600px;
@@ -210,6 +210,91 @@
     opacity: 1;
     transform: translateX(-50%) translateY(0);
   }
+}
+
+/* 슬라이딩 패널 */
+.slidingPanel {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 375px; 
+  background: #DDDBF5;
+  border-radius: 20px 20px 0 0;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
+  z-index: 999;
+  transition: height 0.1s ease;
+}
+
+.slidingPanelHandle {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  height: 60px;
+  background: #DDDBF5;
+  border-radius: 20px 20px 0 0;
+  cursor: grab;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-bottom: 1px solid #DDDBF5;
+  user-select: none;
+  touch-action: none; /* 터치 동작 방지 */
+}
+
+.slidingPanelHandle:active {
+  cursor: grabbing;
+}
+
+.handleIcon {
+  font-size: 20px;
+  color: #6b7280;
+  transition: transform 0.3s ease;
+}
+
+.slidingPanel.open .handleIcon {
+  transform: rotate(180deg);
+}
+
+.slidingPanelContent {
+  padding: 20px;
+  height: calc(100% - 60px);
+  overflow-y: auto;
+}
+
+.panelHeader {
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.panelHeader h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.panelList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.listItem {
+  padding: 12px 16px;
+  background: #f9fafb;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  font-size: 14px;
+  color: #374151;
+  transition: all 0.2s ease;
+}
+
+.listItem:hover {
+  background: #f3f4f6;
+  border-color: #d1d5db;
 }
 
 .locationList { padding: 8px 10px; border-radius: 10px; background: #ffffffcc; backdrop-filter: blur(6px); box-shadow: 0 1px 4px rgba(0,0,0,.08); }
