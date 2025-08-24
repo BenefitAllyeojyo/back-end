@@ -5,7 +5,6 @@ import NotificationPage from './Page/NotificationPage'
 import BenefitMainPage from './Page/BenefitMainPage'
 import EntireMenuPage from './Page/EntireMenuPage'
 import Payment from './Page/Payment'
-import ButtonExamplePage from './Page/ButtonExamplePage'
 import NotFound from './Page/NotFound'
 // TODO: 새로운 제휴 페이지들 import 예정
 // import PartnershipMainPage from './Page/PartnershipMainPage'
@@ -27,7 +26,6 @@ function App() {
           <Route path="/benefit-main" element={<BenefitMainPage />} />
           <Route path="/entire-menu" element={<EntireMenuPage />} />
           <Route path="/pay" element={<Payment />} />
-          <Route path="/button-examples" element={<ButtonExamplePage />} />
           {/* TODO: 새로운 제휴 페이지 라우트 예정 */}
           {/* <Route path="/partnership" element={<PartnershipMainPage />} /> */}
           {/* <Route path="/partnership/map" element={<PartnershipMapPage />} /> */}
