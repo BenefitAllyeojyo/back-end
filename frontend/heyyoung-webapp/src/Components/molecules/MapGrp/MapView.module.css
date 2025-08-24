@@ -60,6 +60,39 @@
 /* LocationPin 내부에서 참조할 수 있게 클래스 노출 (선택) */
 .locationPin {}
 
+/* 현재 위치 마커 스타일 */
+.currentLocationMarker {
+  position: relative;
+  z-index: 1000;
+  cursor: pointer; /* 클릭 가능함을 표시 */
+  transition: transform 0.2s ease; /* 부드러운 호버 효과 */
+}
+
+.currentLocationMarker:hover {
+  transform: scale(1.1); /* 호버 시 약간 확대 */
+}
+
+.currentLocationCircle {
+  position: absolute;
+  border-radius: 50%;
+  animation: pulse 1.5s infinite ease-in-out;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.2;
+  }
+  50% {
+    transform: scale(1.15);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0.2;
+  }
+}
+
 /* 상단 보조 UI */
 .mapInfo { position: absolute; top: 8px; left: 8px; right: 8px; background: transparent; }
 .refreshControls { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
@@ -295,6 +328,80 @@
 .listItem:hover {
   background: #f3f4f6;
   border-color: #d1d5db;
+}
+
+/* 가게 정보 목록 스타일 */
+.storeHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.storeHeader h4 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #1f2937;
+  flex: 1;
+  margin-right: 12px;
+}
+
+.distanceBadge {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+  background: #10b981;
+  color: white;
+  white-space: nowrap;
+}
+
+.storeDetails {
+  margin-top: 8px;
+}
+
+.storeDetails p {
+  margin: 4px 0;
+  font-size: 14px;
+  color: #6b7280;
+}
+
+.category {
+  font-weight: 500;
+  color: #7c3aed;
+}
+
+.address {
+  color: #6b7280;
+}
+
+.phone {
+  color: #059669;
+  font-weight: 500;
+}
+
+.loadingMessage {
+  text-align: center;
+  padding: 20px;
+  color: #6b7280;
+  font-style: italic;
+}
+
+.errorMessage {
+  text-align: center;
+  padding: 20px;
+  color: #dc2626;
+  background: #fef2f2;
+  border-radius: 8px;
+  border: 1px solid #fecaca;
+}
+
+.emptyMessage {
+  text-align: center;
+  padding: 20px;
+  color: #9ca3af;
+  font-style: italic;
 }
 
 .locationList { padding: 8px 10px; border-radius: 10px; background: #ffffffcc; backdrop-filter: blur(6px); box-shadow: 0 1px 4px rgba(0,0,0,.08); }

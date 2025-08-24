@@ -4,8 +4,9 @@ import styles from './MapView.module.css';
 import ToolTipModule from '../../molecules/TextGrp/ToolTipModule';
 import LocationPin from '../../atoms/LocationPin';
 import { MapActionButton } from '../../atoms/Button';
-import { MiniSelectBtn } from '../../atoms/Button';
-import CharacterBtn from '../../atoms/Button/CharacterBtn';
+import CharacterButtonGroup from './CharacterButtonGroup';
+import CategoryButtons from './CategoryButtons';
+import SlidingPanel from './SlidingPanel';
 import GptInput from '../../atoms/Input/GptInput';
 import { stores, convertStoresToMarkers, mapConfig as defaultMapConfig } from '../../../mocks/stores';
 import { useStores } from '../../../hooks/useStores';
@@ -20,13 +21,9 @@ const MapView = ({ schoolName = '서울대학교', schoolColor }) => {
   const [locationError, setLocationError] = useState(null);
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('');
-  const [showSatelliteButtons, setShowSatelliteButtons] = useState(false);
   const [showGptInput, setShowGptInput] = useState(false);
-  const [isSlidingPanelOpen, setIsSlidingPanelOpen] = useState(false);
-  const [panelHeight, setPanelHeight] = useState(60); // 패널 높이 상태
-  const [isDragging, setIsDragging] = useState(false); // 드래그 상태
-  const [dragStartHeight, setDragStartHeight] = useState(60); // 드래그 시작 높이
-  const currentPanelHeight = useRef(60); // 실시간 높이 추적용 ref
+  const [currentLocation, setCurrentLocation] = useState(null);
+  const [currentLocationMarker, setCurrentLocationMarker] = useState(null);
   
   // 커스텀 훅으로 스토어와 파트너십 데이터 가져오기
   const { stores: apiStores, partnerships, isLoading, error } = useStores(1);
@@ -50,6 +47,13 @@ const MapView = ({ schoolName = '서울대학교', schoolColor }) => {
     loadCategories();
   }, [selectedCategory]);
 
+  // 지도 로드 후 현재 위치 가져오기
+  useEffect(() => {
+    if (mapLoaded && mapInstanceRef.current) {
+      getCurrentLocation();
+    }
+  }, [mapLoaded]);
+
   // 카테고리 변경 시 스토어 데이터 업데이트
   const handleCategoryChange = async (categoryCode) => {
     setSelectedCategory(categoryCode);
@@ -63,16 +67,9 @@ const MapView = ({ schoolName = '서울대학교', schoolColor }) => {
     }
   };
 
-  // CharacterBtn 클릭 핸들러
-  const handleCharacterClick = () => {
-    setShowSatelliteButtons(!showSatelliteButtons);
-    setShowGptInput(false); // 위성 버튼 토글 시 GPT 입력창 숨김
-  };
-
   // 챗봇 버튼 클릭 핸들러
   const handleChatbotClick = () => {
     setShowGptInput(!showGptInput);
-    setShowSatelliteButtons(false); // GPT 입력창 표시 시 위성 버튼들 숨김
   };
 
   // 위치 버튼들 클릭 핸들러
@@ -84,154 +81,42 @@ const MapView = ({ schoolName = '서울대학교', schoolColor }) => {
     moveToSchool();
   };
 
-  // 슬라이딩 패널 드래그 관련 함수들
-  const handleMouseDown = (e) => {
-    e.preventDefault();
-    console.log('마우스 다운 - 드래그 시작');
-    setIsDragging(true);
-    setDragStartHeight(panelHeight);
-    currentPanelHeight.current = panelHeight;
-    const startY = e.clientY;
-    let hasMoved = false;
-    
-    const handleMouseMove = (e) => {
-      const deltaY = startY - e.clientY;
-      if (Math.abs(deltaY) > 5) {
-        hasMoved = true;
-      }
-      const newHeight = Math.max(60, Math.min(460, dragStartHeight + deltaY));
-      currentPanelHeight.current = newHeight;
-      setPanelHeight(newHeight);
-      console.log('드래그 중 - 높이:', newHeight, 'deltaY:', deltaY);
-    };
-    
-    const handleMouseUp = () => {
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
-      setIsDragging(false);
+  // 현재 위치 가져오기
+  const getCurrentLocation = () => {
+    if (navigator.geolocation) {
+      const options = {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 60000
+      };
       
-      const finalHeight = currentPanelHeight.current;
-      console.log('드래그 완료 - 최종 높이:', finalHeight, 'dragStartHeight:', dragStartHeight, 'hasMoved:', hasMoved);
-      
-      // 사용자가 의도적으로 드래그한 경우 현재 위치에 고정
-      if (hasMoved && Math.abs(finalHeight - dragStartHeight) > 10) {
-        // 드래그가 10px 이상 움직였으면 의도적인 드래그로 간주
-        // 현재 드래그한 위치에 그대로 고정
-        console.log('의도적 드래그 - 현재 위치 유지:', finalHeight);
-        setPanelHeight(finalHeight);
-        if (finalHeight > 250) {
-          setIsSlidingPanelOpen(true);
-        } else {
-          setIsSlidingPanelOpen(false);
-        }
-      } else if (!hasMoved) {
-        // 드래그가 없었으면 클릭으로 간주하여 토글
-        console.log('클릭으로 간주 - 패널 토글');
-        handlePanelToggle();
-      } else {
-        // 드래그가 거의 없었으면 원래 위치로 복귀
-        console.log('우발적 터치 - 원래 위치로 복귀:', dragStartHeight);
-        setPanelHeight(dragStartHeight);
-      }
-    };
-    
-    document.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('mouseup', handleMouseUp);
-  };
-
-  // 버튼 클릭 시 스르륵 애니메이션
-  const handlePanelToggle = () => {
-    if (isSlidingPanelOpen) {
-      // 열린 상태면 닫기 (60px로 스르륵)
-      animatePanelHeight(panelHeight, 60);
-      setIsSlidingPanelOpen(false);
-    } else {
-      // 닫힌 상태면 열기 (460px로 스르륵)
-      animatePanelHeight(panelHeight, 460);
-      setIsSlidingPanelOpen(true);
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          const location = { lat: latitude, lng: longitude };
+          setCurrentLocation(location);
+          console.log('현재 위치 가져오기 완료:', location);
+          
+          // 현재 위치 마커 생성
+          if (mapInstanceRef.current) {
+            createCurrentLocationMarker(location);
+          }
+        },
+        (error) => {
+          console.error('위치 가져오기 실패:', error);
+          // 서울대학교 위치를 기본값으로 설정
+          const defaultLocation = { lat: 37.4592, lng: 126.9517 };
+          setCurrentLocation(defaultLocation);
+          if (mapInstanceRef.current) {
+            createCurrentLocationMarker(defaultLocation);
+          }
+        },
+        options
+      );
     }
   };
 
-  // 패널 높이 애니메이션 함수
-  const animatePanelHeight = (fromHeight, toHeight) => {
-    const duration = 500; // 0.5초
-    const startTime = Date.now();
-    const startHeight = fromHeight;
-    
-    const animate = () => {
-      const elapsed = Date.now() - startTime;
-      const progress = Math.min(elapsed / duration, 1);
-      
-      // easeInOut 효과
-      const easeProgress = progress < 0.5 
-        ? 2 * progress * progress 
-        : 1 - Math.pow(-2 * progress + 2, 2) / 2;
-      
-      const currentHeight = startHeight + (toHeight - startHeight) * easeProgress;
-      setPanelHeight(currentHeight);
-      
-      if (progress < 1) {
-        requestAnimationFrame(animate);
-      }
-    };
-    
-    animate();
-  };
 
-  const handleTouchStart = (e) => {
-    const touch = e.touches[0];
-    console.log('터치 시작 - 드래그 시작');
-    setIsDragging(true);
-    setDragStartHeight(panelHeight);
-    currentPanelHeight.current = panelHeight;
-    const startY = touch.clientY;
-    let hasMoved = false;
-    
-    const handleTouchMove = (e) => {
-      const touch = e.touches[0];
-      const deltaY = startY - touch.clientY;
-      if (Math.abs(deltaY) > 5) {
-        hasMoved = true;
-      }
-      const newHeight = Math.max(60, Math.min(460, dragStartHeight + deltaY));
-      currentPanelHeight.current = newHeight;
-      setPanelHeight(newHeight);
-      console.log('터치 드래그 중 - 높이:', newHeight, 'deltaY:', deltaY);
-    };
-    
-    const handleTouchEnd = () => {
-      document.removeEventListener('touchmove', handleTouchMove);
-      document.removeEventListener('touchend', handleTouchEnd);
-      setIsDragging(false);
-      
-      const finalHeight = currentPanelHeight.current;
-      console.log('터치 드래그 완료 - 최종 높이:', finalHeight, 'dragStartHeight:', dragStartHeight, 'hasMoved:', hasMoved);
-      
-      // 사용자가 의도적으로 드래그한 경우 현재 위치에 고정
-      if (hasMoved && Math.abs(finalHeight - dragStartHeight) > 10) {
-        // 드래그가 10px 이상 움직였으면 의도적인 드래그로 간주
-        // 현재 드래그한 위치에 그대로 고정
-        console.log('의도적 터치 드래그 - 현재 위치 유지:', finalHeight);
-        setPanelHeight(finalHeight);
-        if (finalHeight > 250) {
-          setIsSlidingPanelOpen(true);
-        } else {
-          setIsSlidingPanelOpen(false);
-        }
-      } else if (!hasMoved) {
-        // 드래그가 없었으면 클릭으로 간주하여 토글
-        console.log('클릭으로 간주 - 패널 토글');
-        handlePanelToggle();
-      } else {
-        // 드래그가 거의 없었으면 원래 위치로 복귀
-        console.log('우발적 터치 - 원래 위치로 복귀:', dragStartHeight);
-        setPanelHeight(dragStartHeight);
-      }
-    };
-    
-    document.addEventListener('touchmove', handleTouchMove);
-    document.addEventListener('touchend', handleTouchEnd);
-  };
 
   const convertApiStoresToMarkers = (storesData) => {
     return storesData.map(store => ({
@@ -253,6 +138,130 @@ const MapView = ({ schoolName = '서울대학교', schoolColor }) => {
       partnershipId: store.partnershipId,
       images: store.images
     }));
+  };
+
+  // 현재 위치 마커 생성
+  const createCurrentLocationMarker = (location) => {
+    if (!mapInstanceRef.current) return;
+    
+    // 기존 마커가 있다면 제거
+    if (currentLocationMarker) {
+      if (currentLocationMarker.marker) {
+        currentLocationMarker.marker.setMap(null);
+      }
+      if (currentLocationMarker.circle) {
+        currentLocationMarker.circle.setMap(null);
+      }
+      if (currentLocationMarker.animationInterval) {
+        clearInterval(currentLocationMarker.animationInterval);
+      }
+    }
+    
+    // RINO_Face.png 이미지로 마커 생성 (패딩 포함하여 중앙 정렬)
+    const markerImage = new kakao.maps.MarkerImage(
+      '/src/assets/images/character/RINO_Face.png',
+      new kakao.maps.Size(60, 60), // 이미지 크기를 60x60으로 확대하여 더 명확한 표시
+      {
+        offset: new kakao.maps.Point(30, 30), // 이미지 중앙을 마커 위치에 맞춤
+        anchor: new kakao.maps.Point(30, 30)  // 앵커 포인트를 이미지 중앙으로 설정
+      }
+    );
+    
+    const marker = new kakao.maps.Marker({
+      position: new kakao.maps.LatLng(location.lat, location.lng),
+      map: mapInstanceRef.current,
+      backgroundColor: 'white',
+      image: markerImage,
+      zIndex: 1000 // 다른 마커들보다 위에 표시
+    });
+    
+    // 마커에 커서 스타일 적용 (클릭 가능함을 표시)
+    const markerElement = marker.getContent();
+    if (markerElement) {
+      markerElement.style.cursor = 'pointer';
+      markerElement.title = '클릭하여 현재 위치로 이동';
+    }
+    
+    // 리노 캐릭터 클릭 시 현재 위치로 지도 이동
+    kakao.maps.event.addListener(marker, 'click', () => {
+      console.log('리노 캐릭터 클릭됨 - 현재 위치로 이동');
+      
+      // 클릭 시 시각적 피드백 (원형 오버레이 강조)
+      circleOverlay.setOptions({
+        strokeWeight: 6,
+        strokeColor: '#4A90E2',
+        fillOpacity: 0.4
+      });
+      
+      // 0.5초 후 원래 스타일로 복원
+      setTimeout(() => {
+        circleOverlay.setOptions({
+          strokeWeight: 4,
+          strokeColor: '#87CEEB',
+          fillOpacity: 0.2
+        });
+      }, 500);
+      
+      const currentLocationLatLng = new kakao.maps.LatLng(location.lat, location.lng);
+      
+      // 부드러운 이동 애니메이션으로 현재 위치로 이동
+      mapInstanceRef.current.panTo(currentLocationLatLng);
+      
+      // 이동 완료 후 줌 레벨 조정
+      setTimeout(() => {
+        mapInstanceRef.current.setLevel(4); // 지도 레벨을 4로 설정
+      }, 300);
+    });
+    
+    // 현재 위치 표시를 위한 원형 오버레이 생성
+    const circleOverlay = new kakao.maps.Circle({
+      center: new kakao.maps.LatLng(location.lat, location.lng),
+      radius: 45, // 반지름을 마커 이미지(60x60)보다 약간 크게 설정하여 적절한 패딩 효과
+      strokeWeight: 4, // 선 두께를 더 두껍게
+      strokeColor: '#87CEEB', // 하늘색 선
+      strokeOpacity: 0.9, // 선 투명도를 더 진하게
+      strokeStyle: 'solid',
+      fillColor: '#FFFFFF', // 하얀색 채우기
+      fillOpacity: 0.2, // 채우기 투명도를 더 투명하게
+      map: mapInstanceRef.current,
+      zIndex: 999 // 마커보다 아래에 표시
+    });
+    
+    // 반짝이는 효과를 위한 애니메이션
+    let opacity = 0.2;
+    let increasing = true;
+    
+    const animateCircle = () => {
+      if (increasing) {
+        opacity += 0.03;
+        if (opacity >= 0.7) {
+          increasing = false;
+        }
+      } else {
+        opacity -= 0.03;
+        if (opacity <= 0.2) {
+          increasing = true;
+        }
+      }
+      
+      circleOverlay.setOptions({
+        fillOpacity: opacity,
+        strokeOpacity: Math.min(opacity + 0.3, 1.0)
+      });
+    };
+    
+    // 80ms마다 애니메이션 실행 (더 부드럽게)
+    const animationInterval = setInterval(animateCircle, 80);
+    
+    // 마커와 원형 오버레이를 함께 저장
+    const markerWithCircle = {
+      marker: marker,
+      circle: circleOverlay,
+      animationInterval: animationInterval
+    };
+    
+    setCurrentLocationMarker(markerWithCircle);
+    console.log('현재 위치 마커 및 원형 오버레이 생성 완료:', location);
   };
 
   // stores 데이터를 마커 형식으로 변환 (기존 목데이터)
@@ -281,6 +290,18 @@ const MapView = ({ schoolName = '서울대학교', schoolColor }) => {
       // 오버레이들 해제
       overlaysRef.current.forEach(ov => ov.setMap(null));
       overlaysRef.current = [];
+      // 현재 위치 마커 정리
+      if (currentLocationMarker) {
+        if (currentLocationMarker.marker) {
+          currentLocationMarker.marker.setMap(null);
+        }
+        if (currentLocationMarker.circle) {
+          currentLocationMarker.circle.setMap(null);
+        }
+        if (currentLocationMarker.animationInterval) {
+          clearInterval(currentLocationMarker.animationInterval);
+        }
+      }
       // 지도 참조 해제
       mapInstanceRef.current = null;
       window.currentMap = null;
@@ -520,15 +541,31 @@ const MapView = ({ schoolName = '서울대학교', schoolColor }) => {
     setLocationLoading(true);
     setLocationError(null);
     
+    // 이미 현재 위치가 있다면 그 위치로 이동
+    if (currentLocation) {
+      const currentLocationLatLng = new kakao.maps.LatLng(currentLocation.lat, currentLocation.lng);
+      mapInstanceRef.current.setCenter(currentLocationLatLng);
+      mapInstanceRef.current.setLevel(3);
+      console.log('저장된 현재 위치로 이동 완료:', currentLocation);
+      setLocationLoading(false);
+      return;
+    }
+    
+    // 현재 위치가 없다면 새로 가져오기
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
           const { latitude, longitude } = position.coords;
-          const currentLocation = new kakao.maps.LatLng(latitude, longitude);
+          const location = { lat: latitude, lng: longitude };
+          setCurrentLocation(location);
+          
+          // 현재 위치 마커 생성
+          createCurrentLocationMarker(location);
           
           // 지도를 현재 위치로 이동
-          mapInstanceRef.current.setCenter(currentLocation);
-          mapInstanceRef.current.setLevel(3); // 적절한 줌 레벨로 설정
+          const currentLocationLatLng = new kakao.maps.LatLng(latitude, longitude);
+          mapInstanceRef.current.setCenter(currentLocationLatLng);
+          mapInstanceRef.current.setLevel(3);
           
           console.log('현재 위치로 이동 완료:', latitude, longitude);
           setLocationLoading(false);
@@ -790,17 +827,12 @@ const MapView = ({ schoolName = '서울대학교', schoolColor }) => {
   return (
     <div className={styles.mapContainer}>
       {/* 카테고리 버튼들 */}
-      {mapLoaded && categories.length > 0 && (
-        <div className={styles.categoryContainer}>
-          {categories.map((category) => (
-            <MiniSelectBtn
-              key={category.id}
-              label={category.displayName}
-              isSelected={selectedCategory === category.code}
-              onClick={() => handleCategoryChange(category.code)}
-            />
-          ))}
-        </div>
+      {mapLoaded && (
+        <CategoryButtons
+          categories={categories}
+          selectedCategory={selectedCategory}
+          onCategoryChange={handleCategoryChange}
+        />
       )}
       
       <div
@@ -811,47 +843,15 @@ const MapView = ({ schoolName = '서울대학교', schoolColor }) => {
       
       {/* CharacterBtn과 위성 버튼들 */}
       {mapLoaded && (
-        <div className={`${styles.characterButtonContainer} ${showGptInput ? styles.withGptInput : ''}`}>
-          {/* 위성 버튼들 */}
-          {showSatelliteButtons && (
-            <>
-              {/* 챗봇 버튼 */}
-              <button
-                className={styles.satelliteButton}
-                onClick={handleChatbotClick}
-                title="챗봇과 대화하기"
-              >
-                💬
-              </button>
-              
-              {/* 학교 위치 버튼 */}
-              <button
-                className={styles.satelliteButton}
-                onClick={handleSchoolClick}
-                title="학교 위치로 이동"
-              >
-                🏫
-              </button>
-              
-              {/* 내 위치 버튼 */}
-              <button
-                className={styles.satelliteButton}
-                onClick={handleLocationClick}
-                title={locationError || '내 위치로 이동'}
-                disabled={locationLoading}
-              >
-                {locationLoading ? '⏳' : locationError ? '❌' : '📍'}
-              </button>
-            </>
-          )}
-          
-          {/* 메인 CharacterBtn */}
-          <CharacterBtn
-            imageUrl="/src/assets/images/character/PLI_Face.png"
-            onClick={handleCharacterClick}
-            alt="플리"
-          />
-        </div>
+        <CharacterButtonGroup
+          showGptInput={showGptInput}
+          onChatbotClick={handleChatbotClick}
+          onSchoolClick={handleSchoolClick}
+          onLocationClick={handleLocationClick}
+          locationLoading={locationLoading}
+          locationError={locationError}
+          currentLocation={currentLocation}
+        />
       )}
 
       {/* GPT 입력창 */}
@@ -861,37 +861,8 @@ const MapView = ({ schoolName = '서울대학교', schoolColor }) => {
         </div>
       )}
 
-      {/* 슬라이딩 패널 */}
-              <div 
-          className={styles.slidingPanel} 
-          style={{ 
-            height: `${panelHeight}px`,
-            transition: isDragging ? 'none' : 'none' // 애니메이션은 JavaScript로 처리
-          }}
-        >
-        <div 
-          className={styles.slidingPanelHandle} 
-          onMouseDown={handleMouseDown}
-          onTouchStart={handleTouchStart}
-        >
-          <div className={styles.handleIcon}>
-            {isSlidingPanelOpen ? '▼' : '▲'}
-          </div>
-        </div>
-        {panelHeight > 60 && (
-          <div className={styles.slidingPanelContent}>
-            {/* 여기에 목록 내용을 담을 수 있습니다 */}
-            <div className={styles.panelHeader}>
-              <h3>목록</h3>
-            </div>
-            <div className={styles.panelList}>
-              <div className={styles.listItem}>목록 항목 1</div>
-              <div className={styles.listItem}>목록 항목 2</div>
-              <div className={styles.listItem}>목록 항목 3</div>
-            </div>
-          </div>
-        )}
-      </div>
+            {/* 슬라이딩 패널 */}
+      <SlidingPanel />
     
     </div>
   );
