@@ -1,13 +1,10 @@
 import { useNavigate } from 'react-router-dom'
 import BackgroundImage from '../Components/atoms/BackgroundImage'
+import { BackButton } from '../Components/atoms/Button'
 import notificationImage from '../assets/images/pages/notification.png'
 
 export default function NotificationPage() {
   const navigate = useNavigate()
-
-  const handleBackClick = () => {
-    navigate('/')
-  }
 
   return (
     <BackgroundImage 
@@ -15,22 +12,17 @@ export default function NotificationPage() {
       alt="알림페이지 배경"
     >
       
-      {/* 뒤로가기 버튼 영역 (투명 클릭 영역) */}
-      <button
-        onClick={handleBackClick}
+      {/* 뒤로가기 버튼 영역 */}
+      <div
         style={{
           position: 'absolute',
-          top: '60px',
+          top: '57px',
           left: '20px',
-          width: '44px',
-          height: '44px',
-          border: 'none',
-          backgroundColor: 'transparent',
-          cursor: 'pointer'
+          zIndex: 10
         }}
       >
-        {/* 투명 클릭 영역 */}
-      </button>
+        <BackButton />
+      </div>
     </BackgroundImage>
   )
 }
