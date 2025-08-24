@@ -52,7 +52,7 @@ public class PartnershipService {
 		}
     }
 
-	@Transactional
+	@Transactional(readOnly = true)
 	public List<String> findAllCategories() {
 		return partnershipRepository.findAll().stream()
 			.map(partnership -> partnership.getCategory().getName())
