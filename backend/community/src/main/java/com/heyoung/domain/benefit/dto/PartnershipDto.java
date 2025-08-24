@@ -12,6 +12,7 @@ public class PartnershipDto {
     private String companyName;
     private Long categoryId;
     private String categoryCode;
+	private String categoryName;
     private BigDecimal discountRate;
     private BigDecimal discountAmount;
     private String terms;
@@ -25,6 +26,7 @@ public class PartnershipDto {
         this.companyName = p.getCompanyName();
         this.categoryId = p.getCategory().getId();
         this.categoryCode = p.getCategory().getCode();
+		this.categoryName = p.getCategory().getName();
         this.discountRate = p.getDiscountRate();
         this.discountAmount = p.getDiscountAmount();
         this.terms = p.getTerms();
