@@ -1,4 +1,5 @@
 import React, { useState, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import ShopTextModule from '../TextGrp/ShopTextModule';
 import { LongVioletBtn } from '../../atoms/Button';
 
@@ -10,6 +11,7 @@ export default function PartnershipCarouselBanner({
   partnerships = [],
   children
 }) {
+  const navigate = useNavigate();
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const [startX, setStartX] = useState(0);
@@ -195,7 +197,10 @@ export default function PartnershipCarouselBanner({
                   }}>
                     <LongVioletBtn
                       label="헤이영 pay로 제휴 결제하기"
-                      onClick={() => console.log('헤이영 pay 결제 버튼 클릭', partnership.id)}
+                      onClick={() => {
+                        console.log('헤이영 pay 결제 버튼 클릭', partnership.id);
+                        navigate('/payment');
+                      }}
                     />
                   </div>
                   
