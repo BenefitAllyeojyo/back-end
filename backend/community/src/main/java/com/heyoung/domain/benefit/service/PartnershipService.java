@@ -1,7 +1,9 @@
 package com.heyoung.domain.benefit.service;
 
 import com.heyoung.domain.benefit.dto.PartnershipDto;
+import com.heyoung.domain.benefit.entity.Category;
 import com.heyoung.domain.benefit.entity.Partnership;
+import com.heyoung.domain.benefit.repository.CategoryRepository;
 import com.heyoung.domain.benefit.repository.PartnershipRepository;
 import com.heyoung.domain.university.entity.UserUniversity;
 import com.heyoung.domain.university.repository.UserUniversityRepository;
@@ -17,10 +19,13 @@ import java.util.stream.Collectors;
 public class PartnershipService {
     private final PartnershipRepository partnershipRepository;
     private final UserUniversityRepository userUniversityRepository;
+	private final CategoryRepository categoryRepository;
 
-    public PartnershipService(PartnershipRepository partnershipRepository, UserUniversityRepository userUniversityRepository) {
+    public PartnershipService(PartnershipRepository partnershipRepository, UserUniversityRepository userUniversityRepository,
+		CategoryRepository categoryRepository) {
         this.partnershipRepository = partnershipRepository;
         this.userUniversityRepository = userUniversityRepository;
+		this.categoryRepository = categoryRepository;
     }
 
     // 모든 대학의 Partnership
@@ -54,8 +59,8 @@ public class PartnershipService {
 
 	@Transactional(readOnly = true)
 	public List<String> findAllCategories() {
-		return partnershipRepository.findAll().stream()
-			.map(partnership -> partnership.getCategory().getName())
+		return categoryRepository.findAll().stream()
+			.map(Category::getName)
 			.toList();
 	}
 }
