@@ -27,12 +27,14 @@ dependencies {
     // PostgreSQL
     runtimeOnly 'org.postgresql:postgresql'
 
+    // WebClient 사용
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
+
     testImplementation 'com.h2database:h2'
     testImplementation platform('org.junit:junit-bom:5.10.0')
     testImplementation 'org.junit.jupiter:junit-jupiter'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     testImplementation("org.springframework.boot:spring-boot-starter-test")
-//    testRuntimeOnly 'org.postgresql:postgresql'  // 테스트 시
 
 }
 

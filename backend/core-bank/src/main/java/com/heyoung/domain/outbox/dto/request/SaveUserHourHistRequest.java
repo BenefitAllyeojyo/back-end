@@ -1,4 +1,4 @@
-package com.heyoung.domain.recommendation.dto.request;
+package com.heyoung.domain.outbox.dto.request;
 
 import java.time.Instant;
 

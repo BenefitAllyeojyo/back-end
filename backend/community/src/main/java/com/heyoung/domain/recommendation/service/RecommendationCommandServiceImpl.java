@@ -4,9 +4,11 @@ import com.heyoung.domain.benefit.service.CategoryQueryService;
 import com.heyoung.domain.benefit.entity.Category;
 import com.heyoung.domain.recommendation.dto.request.SaveUserCategoryRequest;
 import com.heyoung.domain.recommendation.dto.request.SaveUserHourHistRequest;
-import com.heyoung.domain.recommendation.dto.response.SaveSuccessResponse;
+import com.heyoung.domain.recommendation.dto.response.FailedResponseDto;
+import com.heyoung.domain.recommendation.dto.response.SaveResponse;
 import com.heyoung.domain.recommendation.entity.UserCategory;
 import com.heyoung.domain.recommendation.entity.UserHourHist;
+import com.heyoung.domain.recommendation.repository.EventConsumeLogRepository;
 import com.heyoung.domain.recommendation.repository.UserCategoryRepository;
 import com.heyoung.domain.recommendation.repository.UserHourHistRepository;
 import com.heyoung.global.enums.HourBucket;
@@ -19,6 +21,8 @@ import org.springframework.stereotype.Service;
 import java.time.Instant;
 import java.time.LocalTime;
 import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -28,32 +32,59 @@ public class RecommendationCommandServiceImpl implements RecommendationCommandSe
     private final UserCategoryRepository userCategoryRepository;
     private final UserHourHistRepository userHourHistRepository;
     private final CategoryQueryService categoryQueryService;
+    private final EventConsumeLogRepository eventConsumeLogRepository;
 
     @Override
     @Transactional
-    public BaseResponse<SaveSuccessResponse> receiveUserCategory(SaveUserCategoryRequest saveUserCategoryRequest) {
+    public BaseResponse<SaveResponse> receiveUserCategory(List<SaveUserCategoryRequest> saveUserCategoryRequestList) {
 
-        // 선호 카테고리 반영
-        updateUserCategory(userCategoryRepository.findByUserIdAndCategoryId(saveUserCategoryRequest.userId(), saveUserCategoryRequest.categoryId()), saveUserCategoryRequest.userId(), saveUserCategoryRequest.categoryId());
+        List<FailedResponseDto> failed = new ArrayList<>();
 
-        // 선호 시간대 반영
+        for(SaveUserCategoryRequest data : saveUserCategoryRequestList) {
+            try {
+                if (eventConsumeLogRepository.existsByOutboxId(data.outboxId())) {
+                    continue;
+                }
 
-        HourBucket hourBucket = HourBucket.of(changeToHour(saveUserCategoryRequest.transactionDateTime()));
-        updateUserHourHist(getUserHourHist(saveUserCategoryRequest.userId(), hourBucket), saveUserCategoryRequest.userId(), hourBucket);
+                // 선호 카테고리 반영
+                updateUserCategory(userCategoryRepository.findByUserIdAndCategoryId(data.userId(), data.categoryId()), data.userId(), data.categoryId());
 
-        return BaseResponse.onSuccess(new SaveSuccessResponse("카테고리 선호도와 시간대 선호도를 반영했습니다."), ResponseCode.OK);
+                // 선호 시간대 반영
+                HourBucket hourBucket = HourBucket.of(changeToHour(data.transactionDateTime()));
+                updateUserHourHist(getUserHourHist(data.userId(), hourBucket), data.userId(), hourBucket);
+
+            } catch (Exception e) {
+                failed.add(new FailedResponseDto(data.outboxId(), e.getMessage()));
+            }
+        }
+
+        return failed.isEmpty() ? BaseResponse.onSuccess(new SaveResponse(null), ResponseCode.OK) : BaseResponse.onFailure(new SaveResponse(failed), ResponseCode.OK);
 
     }
 
     @Override
-    public BaseResponse<SaveSuccessResponse> receiveUserHourHist(SaveUserHourHistRequest saveUserHourHistRequest) {
+    @Transactional
+    public BaseResponse<SaveResponse> receiveUserHourHist(List<SaveUserHourHistRequest> saveUserHourHistRequestList) {
 
-        HourBucket hourBucket = HourBucket.of(changeToHour(saveUserHourHistRequest.transactionTime()));
-        Optional<UserHourHist> found = getUserHourHist(saveUserHourHistRequest.userId(), hourBucket);
+        List<FailedResponseDto> failed = new ArrayList<>();
 
-        updateUserHourHist(found, saveUserHourHistRequest.userId(), hourBucket);
+        for (SaveUserHourHistRequest data : saveUserHourHistRequestList) {
+            try {
+                if (eventConsumeLogRepository.existsByOutboxId(data.outboxId())) {
+                    continue;
+                }
 
-        return BaseResponse.onSuccess(new SaveSuccessResponse("시간대 선호도를 반영했습니다."), ResponseCode.OK);
+                HourBucket hourBucket = HourBucket.of(changeToHour(data.transactionTime()));
+                Optional<UserHourHist> found = getUserHourHist(data.userId(), hourBucket);
+
+                updateUserHourHist(found, data.userId(), hourBucket);
+
+            } catch (Exception e) {
+                failed.add(new FailedResponseDto(data.outboxId(), e.getMessage()));
+            }
+        }
+
+        return failed.isEmpty() ? BaseResponse.onSuccess(new SaveResponse(null), ResponseCode.OK) : BaseResponse.onFailure(new SaveResponse(failed), ResponseCode.OK);
 
     }
 

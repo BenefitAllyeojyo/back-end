@@ -22,7 +22,14 @@ public enum ResponseCode {
     _FORBIDDEN(HttpStatus.FORBIDDEN, "COMMON004", "금지된 요청입니다."),
 
     // JsonError
-    JSON_CREATE_FAIL(HttpStatus.INTERNAL_SERVER_ERROR, "JSON001", "JSON 파일 생성에 실패했습니다.");
+    JSON_CREATE_FAIL(HttpStatus.INTERNAL_SERVER_ERROR, "JSON001", "JSON 파일 생성에 실패했습니다."),
+
+    // WebHook Error
+    PATH_NOT_FOUND(HttpStatus.NOT_FOUND, "WEBHOOK001", "해당 키의 PATH 가 존재하지 않습니다."),
+
+    // Dispatcher Error
+    INVALID_PAYLOAD(HttpStatus.BAD_REQUEST, "DISPATCHER001", "지원하지 않는 PAYLOAD 입니다."),
+    NULL_RESPONSE(HttpStatus.INTERNAL_SERVER_ERROR, "DISPATCHER002", "응답이 존재하지 않습니다.");
 
     private final HttpStatus httpStatus;
     private final String code;

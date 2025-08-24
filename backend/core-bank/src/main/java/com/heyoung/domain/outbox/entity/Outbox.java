@@ -5,13 +5,12 @@ import com.heyoung.domain.payment.entity.Transaction;
 import com.heyoung.global.entity.BaseEntity;
 import com.heyoung.global.enums.OutboxType;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.Instant;
 
 @Entity
+@Getter @Setter
 @Builder
 @Table(
         name = "outbox",
