@@ -196,7 +196,7 @@ export default function PartnershipCarouselBanner({
                     marginBottom: '10px'
                   }}>
                     <LongVioletBtn
-                      label="헤이영 pay로 제휴 결제하기"
+                      label="제휴 혜택 상세 보기"
                       onClick={() => {
                         console.log('헤이영 pay 결제 버튼 클릭', partnership.id);
                         navigate('/payment');
