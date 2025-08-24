@@ -12,6 +12,10 @@ import RegularButton from '@/Components/atoms/Button/RegularButton'
 import SearchBtn from '@/Components/atoms/Button/SearchBtn'
 import SquareWhiteBtn from '@/Components/atoms/Button/SquareWhiteBtn'
 import { Carousel } from '@/Components/molecules/Carousel'
+import carousel1Image from '@/assets/images/carousel/carousel1.png'
+import carousel2Image from '@/assets/images/carousel/carousel2.png'
+import carousel3Image from '@/assets/images/carousel/carousel3.png'
+import pliFaceImage from '@/assets/images/character/PLI_Face.png'
 
 export default function ButtonExamplePage() {
   const handleClick = (buttonName) => {
@@ -21,13 +25,13 @@ export default function ButtonExamplePage() {
   // 카루셀 테스트용 데이터
   const carouselSlides = [
     {
-      image: '/src/assets/images/carousel/carousel1.png',
+      image: carousel1Image,
     },
     {
-      image: '/src/assets/images/carousel/carousel2.png',
+      image: carousel2Image,
     },
     {
-      image: '/src/assets/images/carousel/carousel3.png',
+      image: carousel3Image,
     }
   ]
 
@@ -115,7 +119,7 @@ export default function ButtonExamplePage() {
             onClick={() => handleClick('Character Default')} 
           />
           <CharacterBtn 
-            imageUrl="/src/assets/images/character/PLI_Face.png"
+            imageUrl={pliFaceImage}
             onClick={() => handleClick('Character With Image')} 
           />
           <CharacterBtn 
