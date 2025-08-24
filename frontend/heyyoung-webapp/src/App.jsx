@@ -12,7 +12,9 @@ import NotFound from './Page/NotFound'
 // import PartnershipMapPage from './Page/PartnershipMapPage'
 import PartnershipListPage from './Page/PartnershipListPage'
 // import PartnershipDetailPage from './Page/PartnershipDetailPage'
-// import PaymentPage from './Page/PaymentPage'
+import PaymentPage from './Page/PaymentPage'
+import PaymentResultPage from './Page/PaymentResultPage'
+
 import './App.css'
 
 function App() {
@@ -31,7 +33,8 @@ function App() {
           {/* <Route path="/partnership/map" element={<PartnershipMapPage />} /> */}
           <Route path="/partnership/list" element={<PartnershipListPage />} />
           {/* <Route path="/partnership/detail/:id" element={<PartnershipDetailPage />} /> */}
-          {/* <Route path="/payment" element={<PaymentPage />} /> */}
+          <Route path="/payment" element={<PaymentPage />} />
+          <Route path="/payment-result" element={<PaymentResultPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </AppShell>
