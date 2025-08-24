@@ -4,6 +4,7 @@ import com.heyoung.domain.benefit.entity.Partnership;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import java.math.BigDecimal;
+import java.util.List;
 
 @Getter
 @AllArgsConstructor
@@ -20,6 +21,7 @@ public class PartnershipDto {
     private String status;
     private Long universityId;
     private String universityName;
+	private List<PartnershipBranchDto> partnershipBranchDto;
 
     public PartnershipDto(Partnership p) {
         this.id = p.getId();
@@ -34,6 +36,8 @@ public class PartnershipDto {
         this.status = p.getStatus().name();
         this.universityId = p.getUniversity().getId();
         this.universityName = p.getUniversity().getName();
+		this.partnershipBranchDto = p.getPartnershipBranches().stream()
+			.map(PartnershipBranchDto::new)
+			.toList();
     }
-
 }

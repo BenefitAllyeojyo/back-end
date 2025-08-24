@@ -21,7 +21,7 @@ public class PartnershipController {
         this.partnershipService = partnershipService;
     }
 
-    @Operation(summary="사용자 대학의 제휴 정보를 조회하는 API", description = "사용자 대학의 제휴 정보를 조회하는 API입니다.")
+    @Operation(summary="1. 사용자 대학의 제휴 정보를 조회하는 API", description = "사용자 대학의 제휴 정보를 조회하는 API입니다.")
     @GetMapping("/university")
     public BaseResponse<List<PartnershipDto>> getPartnerships(
 		@MemberId Long memberId,
@@ -31,7 +31,7 @@ public class PartnershipController {
         return BaseResponse.onSuccess(partnershipService.findPartnerships(memberId, category), ResponseCode.OK);
     }
 
-	@Operation(summary = "모든 카테고리 유형을 조회하는 API", description = "모든 카테고리 유형을 조회하는 API입니다.")
+	@Operation(summary = "2. 모든 카테고리 유형을 조회하는 API", description = "모든 카테고리 유형을 조회하는 API입니다.")
 	@GetMapping("/categories")
 	public BaseResponse<List<String>> getCategories() {
 		return BaseResponse.onSuccess(partnershipService.findAllCategories(), ResponseCode.OK);

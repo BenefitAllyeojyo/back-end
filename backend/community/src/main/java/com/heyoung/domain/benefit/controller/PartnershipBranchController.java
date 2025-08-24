@@ -24,7 +24,7 @@ public class PartnershipBranchController {
         this.partnershipBranchService = partnershipBranchService;
     }
 
-    @Operation(summary="모든 제휴 지점의 정보를 조회하는 API", description = "모든 제휴 지점의 정보를 조회하는 API입니다.")
+    @Operation(summary="3. 모든 제휴 지점의 정보를 조회하는 API", description = "모든 제휴 지점의 정보를 조회하는 API입니다.")
     @GetMapping("/{partnershipId}/branches")
     public BaseResponse<List<PartnershipBranchDto>> getAllPartnershipBranches(@PathVariable Long partnershipId) {
         return BaseResponse.onSuccess(partnershipBranchService.findAllPartnershipBranches(partnershipId), ResponseCode.OK);
