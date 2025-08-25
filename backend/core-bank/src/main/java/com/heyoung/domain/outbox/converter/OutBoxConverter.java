@@ -12,6 +12,7 @@ import com.heyoung.global.enums.OutboxType;
 import com.heyoung.global.exception.ResponseCode;
 import com.heyoung.global.utils.UuidUtil;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -24,20 +25,18 @@ public class OutBoxConverter {
     private final ObjectMapper om; // ← 전역 설정 주입
     private final UuidUtil uuidUtil;
 
-    public Outbox transactionToOutBox(Transaction transaction) {
+    public Outbox transactionToOutBox(TransactionResponseDto transactionResponseDto) {
 
         String json = null;
         try {
-            json = om.writeValueAsString(
-                    new TransactionResponseDto(transaction.getUser().getId(), transaction.getCategory().getId(), transaction.getTransactionDateTime())
-            );
+            json = om.writeValueAsString(transactionResponseDto);
         } catch (JsonProcessingException e) {
             throw new OutboxControllerAdvice(ResponseCode.JSON_CREATE_FAIL);
         }
 
         return Outbox.builder()
                 .payload(json)// Json - 결제 후 사용자 취향 반영해야 하는 데이터 전송
-                .occurredAt(transaction.getTransactionDateTime())
+                .occurredAt(transactionResponseDto.transactionDateTime())
                 .uniqKey(uuidUtil.createUuid())
                 .type(OutboxType.TRANSACTION_COMPLETED).build();
     }

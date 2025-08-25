@@ -1,12 +1,10 @@
 package com.heyoung.domain.outbox.service;
 
 import com.heyoung.domain.outbox.converter.OutBoxConverter;
+import com.heyoung.domain.outbox.dto.response.TransactionResponseDto;
 import com.heyoung.domain.outbox.entity.Outbox;
-import com.heyoung.domain.outbox.exception.advice.OutboxControllerAdvice;
 import com.heyoung.domain.outbox.repository.OutBoxRepository;
 import com.heyoung.domain.payment.dto.response.TransactionListResponse;
-import com.heyoung.domain.payment.entity.Account;
-import com.heyoung.domain.payment.entity.Transaction;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -20,9 +18,9 @@ public class OutBoxCommandServiceImpl implements OutBoxCommandService {
     private final OutBoxConverter outBoxConverter;
 
     @Override
-    public void saveTransactionOutBox(Transaction transaction) {
+    public void saveTransactionOutBox(TransactionResponseDto transactionResponseDto) {
 
-        Outbox outbox = outBoxConverter.transactionToOutBox(transaction);
+        Outbox outbox = outBoxConverter.transactionToOutBox(transactionResponseDto);
         outBoxRepository.save(outbox);
 
     }
