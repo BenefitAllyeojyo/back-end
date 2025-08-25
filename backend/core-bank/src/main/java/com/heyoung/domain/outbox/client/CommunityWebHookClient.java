@@ -9,6 +9,7 @@ import com.heyoung.global.enums.OutboxType;
 import com.heyoung.global.exception.BaseResponse;
 import com.heyoung.global.exception.ResponseCode;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
@@ -22,10 +23,12 @@ import java.util.Map;
 @Component
 @RequiredArgsConstructor
 public class CommunityWebHookClient {
+
+    @Qualifier("communityWebClient")
     private final WebClient communityWebClient; // base-url 적용
     private final CommunityProps communityProps; // 타입-경로 매핑
 
-    private static final Duration TIMEOUT = Duration.ofSeconds(10);
+    private static final Duration TIMEOUT = Duration.ofSeconds(20);
 
     private static final ParameterizedTypeReference<BaseResponse<SaveResponse>> BASE_SAVE_RESP =
             new ParameterizedTypeReference<>() {};
@@ -48,12 +51,12 @@ public class CommunityWebHookClient {
         return communityWebClient.post()
                 .uri(path)
                 .contentType(MediaType.APPLICATION_JSON)
-                .exchangeToMono(resp ->
-                        resp.bodyToMono(BASE_SAVE_RESP)
-                                .defaultIfEmpty(new BaseResponse<>(resp.statusCode().is2xxSuccessful(),
-                                        "HTTP_" + resp.statusCode(), "empty body", null))
-                                .onErrorResume(e ->
-                                        Mono.just(new BaseResponse<>(false, "HTTP_" + resp.statusCode(), safeMsg(e), null))))
+                .accept(MediaType.APPLICATION_JSON)
+                .bodyValue(items)
+                .exchangeToMono(resp -> {
+                    return resp.bodyToMono(BASE_SAVE_RESP)
+                            .defaultIfEmpty(new BaseResponse<>(true, "HTTP_" + resp.statusCode(), "empty body", null));
+                })
                 .timeout(TIMEOUT)
                 .onErrorResume(e -> Mono.just(new BaseResponse<>(false, "NETWORK", safeMsg(e), null)))
                 .block();
