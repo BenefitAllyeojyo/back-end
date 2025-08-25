@@ -104,12 +104,12 @@ INSERT INTO partnership (
 (
     2, 'OliveYoung', 2, 10.00, 3000.00,
     '10% off for university students', 'Notes about the partnership',
-    'ACTIVE', 3, NOW(), NOW()
+    'ACTIVE', 1, NOW(), NOW()
 ),
 (
     3, 'CU', 3, 10.00, 3000.00,
     '10% off for university students', 'Notes about the partnership',
-    'EXPIRED', 3, NOW(), NOW()
+    'EXPIRED', 1, NOW(), NOW()
 )
 ON CONFLICT (id) DO NOTHING;
 
