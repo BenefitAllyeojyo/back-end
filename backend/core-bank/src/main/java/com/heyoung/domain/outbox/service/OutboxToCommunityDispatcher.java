@@ -40,6 +40,7 @@ public class OutboxToCommunityDispatcher {
     private static final int BACKOFF_MAX_S  = 300;  // 백오프 최대(초)
     private static final double JITTER_RATE = 0.2;  // ±20% 지터
 
+    @Transactional
     @Scheduled(
             fixedDelayString = "${outbox.dispatch.delay-ms:5000}",
             initialDelayString = "${outbox.dispatch.initial-delay-ms:2000}"
@@ -72,9 +73,9 @@ public class OutboxToCommunityDispatcher {
             OutboxType type = entry.getKey();
             List<Outbox> group = entry.getValue();
 
-            if(OutboxType.TRANSACTION_COMPLETED.name().equals(type)) {
+            if(OutboxType.TRANSACTION_COMPLETED.equals(type)) {
                 totalAcked += sendCategoryBatches(group);
-            } else if(OutboxType.PAYMENT_METHOD_LINKED.name().equals(type)) {
+            } else if(OutboxType.PAYMENT_METHOD_LINKED.equals(type)) {
                 totalAcked += sendHourBatches(group);
             } else {
                 // 알 수 없는 타입 실패 마킹
