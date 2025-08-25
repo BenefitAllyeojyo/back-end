@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import styles from './StoreListItem.module.css';
@@ -47,6 +47,42 @@ const formatDistance = (distance) => {
   }
 };
 
+// 위도경도로부터 거리 계산 (Haversine 공식)
+const calculateDistance = (lat1, lng1, lat2, lng2) => {
+  const R = 6371; // 지구의 반지름 (km)
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLng = (lng2 - lng1) * Math.PI / 180;
+  const a = 
+    Math.sin(dLat/2) * Math.sin(dLat/2) +
+    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+    Math.sin(dLng/2) * Math.sin(dLng/2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  const distance = R * c; // km 단위
+  return distance * 1000; // m 단위로 변환
+};
+
+// 현재 위치 가져오기
+const getCurrentLocation = () => {
+  return new Promise((resolve, reject) => {
+    if (!navigator.geolocation) {
+      reject(new Error('Geolocation is not supported'));
+      return;
+    }
+    
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        resolve({
+          lat: position.coords.latitude,
+          lng: position.coords.longitude
+        });
+      },
+      (error) => {
+        reject(error);
+      }
+    );
+  });
+};
+
 const StoreListItem = ({
   store,
   onItemClick,
@@ -57,6 +93,7 @@ const StoreListItem = ({
   const navigate = useNavigate();
   const [todayDay, setTodayDay] = useState({ day: 0, dayName: '일' });
   const [currentTime, setCurrentTime] = useState('');
+  const [calculatedDistance, setCalculatedDistance] = useState(null);
 
   // 오늘 요일 가져오기 (0: 일요일, 1: 월요일, ..., 6: 토요일)
   const getTodayDay = () => {
@@ -122,6 +159,30 @@ const StoreListItem = ({
     }
   };
 
+  // 컴포넌트 마운트 시 거리 계산
+  useEffect(() => {
+    const calculateStoreDistance = async () => {
+      try {
+        if (store.lat && store.lng) {
+          const currentLocation = await getCurrentLocation();
+          const distance = calculateDistance(
+            currentLocation.lat, 
+            currentLocation.lng, 
+            store.lat, 
+            store.lng
+          );
+          setCalculatedDistance(distance);
+        }
+      } catch (error) {
+        console.error('거리 계산 실패:', error);
+        // 실패 시 기존 distance 사용
+        setCalculatedDistance(store.distance);
+      }
+    };
+
+    calculateStoreDistance();
+  }, [store.lat, store.lng, store.distance]);
+
   const handleDetailClick = (e) => {
     e.stopPropagation(); // 부모 요소의 onClick 이벤트 전파 방지
     if (store.partnershipBranchDto?.id) {
@@ -151,8 +212,8 @@ const StoreListItem = ({
       <div className={styles.storeHeader}>
         <h4 className={styles.storeName}>{store.name}</h4>
         <div className={styles.tagGroup}>
-          {showDistance && store.distance && (
-            <span className={styles.distanceBadge}>{formatDistance(store.distance)}</span>
+          {showDistance && calculatedDistance !== null && (
+            <span className={styles.distanceBadge}>{formatDistance(calculatedDistance)}</span>
           )}
           {showCategory && store.category && (
             <span className={styles.categoryBadge}>
