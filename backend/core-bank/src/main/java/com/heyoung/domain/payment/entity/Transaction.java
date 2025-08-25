@@ -3,15 +3,15 @@ package com.heyoung.domain.payment.entity;
 import com.heyoung.domain.user.entity.User;
 import com.heyoung.global.enums.TransactionStatus;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.Instant;
 
 @Entity @Getter
 @Table(name = "`transactions`")
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Transaction {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
