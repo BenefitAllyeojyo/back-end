@@ -103,12 +103,22 @@ const StoreListItem = ({
     return { day, dayName: dayNames[day] };
   };
 
-  // 현재 시간 가져오기 (HH:MM 형식)
+  // 현재 시간 가져오기 (한국 시간대 KST, UTC+9)
   const getCurrentTime = () => {
     const now = new Date();
-    const hours = now.getHours().toString().padStart(2, '0');
-    const minutes = now.getMinutes().toString().padStart(2, '0');
+    // 한국 시간대 설정 (UTC+9)
+    const koreaTime = new Date(now.getTime() + (9 * 60 * 60 * 1000));
+    const hours = koreaTime.getUTCHours().toString().padStart(2, '0');
+    const minutes = koreaTime.getUTCMinutes().toString().padStart(2, '0');
     return `${hours}:${minutes}`;
+  };
+
+  // 한국 시간대 기준 현재 시간을 분 단위로 가져오기
+  const getCurrentTimeInMinutes = () => {
+    const now = new Date();
+    // 한국 시간대 설정 (UTC+9)
+    const koreaTime = new Date(now.getTime() + (9 * 60 * 60 * 1000));
+    return koreaTime.getUTCHours() * 60 + koreaTime.getUTCMinutes();
   };
 
   // 오늘 영업시간 가져오기
@@ -142,17 +152,19 @@ const StoreListItem = ({
     const todayHours = getTodayBusinessHours();
     if (todayHours.length === 0) return 'closed';
     
-    const timeMatch = todayHours[0].match(/(\d{1,2}):(\d{2})~(\d{1,2}):(\d{2})/);
+    // 07:00-22:00 형식 파싱
+    const timeMatch = todayHours[0].match(/(\d{1,2}):(\d{2})-(\d{1,2}):(\d{2})/);
     if (!timeMatch) return 'closed';
     
     const [, openHour, openMin, closeHour, closeMin] = timeMatch;
-    const openTime = `${openHour}:${openMin}`;
-    const closeTime = `${closeHour}:${closeMin}`;
     
-    const now = new Date();
-    const currentTimeStr = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+    // 한국 시간대 기준 현재 시간을 분 단위로 가져오기
+    const currentTimeInMinutes = getCurrentTimeInMinutes();
+    const openTimeInMinutes = parseInt(openHour) * 60 + parseInt(openMin);
+    const closeTimeInMinutes = parseInt(closeHour) * 60 + parseInt(closeMin);
     
-    if (openTime <= currentTimeStr && currentTimeStr <= closeTime) {
+    // 영업시간 내에 있는지 확인
+    if (openTimeInMinutes <= currentTimeInMinutes && currentTimeInMinutes <= closeTimeInMinutes) {
       return 'open';
     } else {
       return 'closed';
