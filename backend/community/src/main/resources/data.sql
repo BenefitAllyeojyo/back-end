@@ -186,3 +186,7 @@ VALUES
     (4, 'https://heyoung.s3.ap-northeast-2.amazonaws.com/store_image.png', 2),
     (5, 'https://heyoung.s3.ap-northeast-2.amazonaws.com/store_image.png', 3)
 ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO user_university (id, user_id, university_id, created_date, updated_date)
+VALUES (1, 1, 1, NOW(), NOW())
+ON CONFLICT (id) DO NOTHING;
