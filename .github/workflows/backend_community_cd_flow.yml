@@ -5,8 +5,6 @@ on:
       - main
       - dev/backend
       - release/backend
-    paths:
-      - 'backend/community/**'
 
 jobs:
   build:
