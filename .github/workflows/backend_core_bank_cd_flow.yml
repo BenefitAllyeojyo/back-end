@@ -1,10 +1,10 @@
-name: backend_community_cd_flow
+name: backend_core_bank_cd_flow
 on:
   push:
     branches:
       - release/backend
     paths:
-      - 'backend/community/**'
+      - 'backend/core-bank/**'
 
 jobs:
   build:
@@ -30,8 +30,8 @@ jobs:
 
       - name: Create application.yml files
         run: |
-          touch ./backend/community/src/test/resources/application.yml
-          echo "${{ secrets.COMMUNITY_RELEASE_APPLICATION }}" > ./backend/community/src/main/resources/application.yml
+          touch ./backend/core-bank/src/test/resources/application.yml
+          echo "${{ secrets.CORE_BANK_RELEASE_APPLICATION }}" > ./backend/core-bank/src/main/resources/application.yml
 
       - name: Cache Gradle packages
         uses: actions/cache@v4
@@ -40,18 +40,18 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
           restore-keys: ${{ runner.os }}-gradle
 
-      - name: Build community server
+      - name: Build core-bank server
         working-directory: backend
         run: |
           chmod +x ./gradlew
-          ./gradlew :community:clean :community:bootJar -x test --info
-          
+          ./gradlew :core-bank:clean :core-bank:bootJar -x test --info
 
-      - name: Upload build artifact (community jar)
+
+      - name: Upload build artifact (core-bank jar)
         uses: actions/upload-artifact@v4
         with:
-          name: community-jar
-          path: backend/community/build/libs/community-0.0.1-SNAPSHOT.jar
+          name: core-bank-jar
+          path: backend/core-bank/build/libs/core-bank-0.0.1-SNAPSHOT.jar
           if-no-files-found: error
 
   upload:
@@ -62,8 +62,8 @@ jobs:
       - name: Download artifact
         uses: actions/download-artifact@v4
         with:
-          name: community-jar
-          path: ./backend/community/build/libs
+          name: core-bank-jar
+          path: ./backend/core-bank/build/libs
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -74,5 +74,5 @@ jobs:
 
       - name: Upload jar to S3
         run: |
-          aws s3 cp ./backend/community/build/libs/community-0.0.1-SNAPSHOT.jar s3://${{ secrets.AWS_S3_BUCKET_NAME }}/
+          aws s3 cp ./backend/core-bank/build/libs/core-bank-0.0.1-SNAPSHOT.jar s3://${{ secrets.AWS_S3_BUCKET_NAME }}/
 
