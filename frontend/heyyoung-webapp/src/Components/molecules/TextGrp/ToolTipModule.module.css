@@ -83,6 +83,13 @@
   color: var(--neutral-light-light);
 }
 
+.buttonContainer {
+  margin-top: 8px;
+  display: flex;
+  justify-content: left;
+  width: 100%;
+}
+
 .TipContainer {
   position: absolute;
   left: 15px; /* 툴팁 왼쪽에서 15px 떨어진 위치 (더 가깝게) */

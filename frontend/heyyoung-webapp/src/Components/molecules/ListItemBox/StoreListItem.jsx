@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import styles from './StoreListItem.module.css';
 import RegularButton from '@/Components/atoms/Button/RegularButton';
@@ -90,7 +89,6 @@ const StoreListItem = ({
   showCategory = true,
   showPhone = true,
 }) => {
-  const navigate = useNavigate();
   const [todayDay, setTodayDay] = useState({ day: 0, dayName: '일' });
   const [currentTime, setCurrentTime] = useState('');
   const [calculatedDistance, setCalculatedDistance] = useState(null);
@@ -196,9 +194,19 @@ const StoreListItem = ({
   }, [store.lat, store.lng, store.distance]);
 
   const handleDetailClick = (e) => {
+    e.preventDefault();
     e.stopPropagation(); // 부모 요소의 onClick 이벤트 전파 방지
-    if (store.partnershipBranchDto?.id) {
-      navigate(`/store-detail/${store.partnershipBranchDto.id}`);
+    console.log('StoreListItem handleDetailClick 호출됨');
+    console.log('StoreListItem store.id:', store.id);
+    
+    if (store.id) {
+      console.log('storeId가 있음, 세션스토리지에 저장하고 페이지 이동');
+      // 세션스토리지에 storeId 저장
+      sessionStorage.setItem('selectedStoreId', store.id);
+      // window.location.href 사용하여 URL에 ID 표시 안함
+      window.location.href = `/store-detail`;
+    } else {
+      console.log('storeId가 없습니다');
     }
   };
 
@@ -266,7 +274,13 @@ const StoreListItem = ({
       )}
 
       {/* 상세보기 버튼 */}
-      <div className={styles.detailButtonContainer} >
+      <div 
+        className={styles.detailButtonContainer}
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+        }}
+      >
         <RegularButton onClick={handleDetailClick} label="상세보기"/>
       </div>
     </div>

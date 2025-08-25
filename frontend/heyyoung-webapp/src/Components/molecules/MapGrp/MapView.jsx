@@ -1011,6 +1011,7 @@ const MapView = ({ schoolName = '서울대학교', schoolColor }) => {
         discountAmount={markerData.discountAmount}
         terms={markerData.terms}
         category={markerData.category.toUpperCase()}
+        storeId={markerData.id || markerData.partnershipBranchDto?.id}
       />
     );
 
