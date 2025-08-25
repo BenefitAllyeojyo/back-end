@@ -57,7 +57,15 @@ export default function StoreDetailPage() {
   }
 
   if (!storeId) {
-    return <div className={styles.container}>가게 정보를 찾을 수 없습니다.</div>;
+    return (
+      <div className={styles.container}>
+        <div className={styles.noDataMessage}>
+          <h1>정보가 없어요!</h1>
+          <p>가게 정보를 찾을 수 없습니다.</p>
+          <p>상세보기 버튼을 통해 접근해주세요.</p>
+        </div>
+      </div>
+    );
   }
 
   return (

@@ -10,3 +10,30 @@
   font-size: 18px;
   color: #6b7280;
 }
+
+.noDataMessage {
+  text-align: center;
+  padding: 60px 20px;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.noDataMessage h1 {
+  font-size: 32px;
+  font-weight: 700;
+  color: #374151;
+  margin-bottom: 16px;
+}
+
+.noDataMessage p {
+  font-size: 16px;
+  color: #6b7280;
+  margin-bottom: 8px;
+  line-height: 1.5;
+}
+
+.noDataMessage p:last-child {
+  margin-bottom: 0;
+  font-size: 14px;
+  color: #9ca3af;
+}
