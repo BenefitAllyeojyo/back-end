@@ -37,3 +37,19 @@
   font-size: 14px;
   color: #9ca3af;
 }
+
+/* 지도 컨테이너 */
+.mapContainer {
+  margin: 20px 0;
+  display: flex;
+  justify-content: center;
+}
+
+/* 지도 */
+.storeMap {
+  width: 100%;
+  height: 150px;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}

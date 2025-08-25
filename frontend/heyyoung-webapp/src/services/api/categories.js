@@ -1,4 +1,4 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://api.brainpix.net';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 /**
  * 카테고리 목록을 가져오는 API

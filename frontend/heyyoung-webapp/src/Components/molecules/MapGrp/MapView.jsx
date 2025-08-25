@@ -13,6 +13,8 @@ import { mapConfig as defaultMapConfig } from '../../../mocks/stores';
 import { useStores } from '../../../hooks/useStores';
 import { fetchCategories, fetchStoresByCategory } from '../../../services/api';
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 const MapView = ({ schoolName = '서울대학교', schoolColor }) => {
   const mapRef = useRef(null);
   const mapInstanceRef = useRef(null);
@@ -123,10 +125,10 @@ const MapView = ({ schoolName = '서울대학교', schoolColor }) => {
     try {
       let apiUrl;
       if (categoryCode === 'ALL') {
-        apiUrl = 'http://api.brainpix.net/partnerships/university';
+        apiUrl = `${API_BASE_URL}/partnerships/university`;
         console.log(`📡 API 호출: ${apiUrl} (전체 카테고리)`);
       } else {
-        apiUrl = `http://api.brainpix.net/partnerships/university?category=${categoryCode.toUpperCase()}`;
+        apiUrl = `${API_BASE_URL}/partnerships/university?category=${categoryCode.toUpperCase()}`;
         console.log(`📡 API 호출: ${apiUrl}`);
       }
 
@@ -158,11 +160,11 @@ const MapView = ({ schoolName = '서울대학교', schoolColor }) => {
       let apiUrl;
       if (categoryCode === 'ALL') {
         // 전체 선택 시 빈 카테고리로 API 호출
-        apiUrl = 'http://api.brainpix.net/partnerships/university?category=';
+        apiUrl = `${API_BASE_URL}/partnerships/university?category=`;
         console.log(`📡 전체 카테고리 API 호출: ${apiUrl}`);
       } else {
         // 특정 카테고리 선택 시 해당 카테고리로 API 호출
-        apiUrl = `http://api.brainpix.net/partnerships/university?category=${categoryCode.toUpperCase()}`;
+        apiUrl = `${API_BASE_URL}/partnerships/university?category=${categoryCode.toUpperCase()}`;
         console.log(`📡 카테고리별 API 호출: ${apiUrl}`);
       }
       

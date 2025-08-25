@@ -1,4 +1,4 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://api.brainpix.net';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 /**
  * 스토어 정보를 가져오는 API
