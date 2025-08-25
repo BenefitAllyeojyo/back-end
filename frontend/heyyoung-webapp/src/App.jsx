@@ -6,13 +6,9 @@ import BenefitMainPage from './Page/BenefitMainPage'
 import EntireMenuPage from './Page/EntireMenuPage'
 import Payment from './Page/Payment'
 import ButtonExamplePage from './Page/ButtonExamplePage'
+import MapView from './Page/MapView'
+import StoreDetailPage from './Page/StoreDetailPage'
 import NotFound from './Page/NotFound'
-// TODO: 새로운 제휴 페이지들 import 예정
-// import PartnershipMainPage from './Page/PartnershipMainPage'
-// import PartnershipMapPage from './Page/PartnershipMapPage'
-import PartnershipListPage from './Page/PartnershipListPage'
-// import PartnershipDetailPage from './Page/PartnershipDetailPage'
-// import PaymentPage from './Page/PaymentPage'
 import './App.css'
 
 function App() {
@@ -26,12 +22,8 @@ function App() {
           <Route path="/entire-menu" element={<EntireMenuPage />} />
           <Route path="/pay" element={<Payment />} />
           <Route path="/button-examples" element={<ButtonExamplePage />} />
-          {/* TODO: 새로운 제휴 페이지 라우트 예정 */}
-          {/* <Route path="/partnership" element={<PartnershipMainPage />} /> */}
-          {/* <Route path="/partnership/map" element={<PartnershipMapPage />} /> */}
-          <Route path="/partnership/list" element={<PartnershipListPage />} />
-          {/* <Route path="/partnership/detail/:id" element={<PartnershipDetailPage />} /> */}
-          {/* <Route path="/payment" element={<PaymentPage />} /> */}
+          <Route path="/benefit-map" element={<MapView />} />
+          <Route path="/store-detail" element={<StoreDetailPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </AppShell>
