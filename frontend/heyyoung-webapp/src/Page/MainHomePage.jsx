@@ -10,7 +10,7 @@ export default function MainHomePage() {
 
   const handleBannerClick = () => {
     console.log('메인 배너 클릭됨!')
-    navigate('/partnership/list') // 파트너십 리스트 페이지로 이동
+    navigate('/partnership') // 파트너십 리스트 페이지로 이동
   }
 
   return (
