@@ -28,16 +28,6 @@ export default function ToolTipModule({ name, content, address, lat, lng, phone,
                 📍 {address}
               </div>
             )}
-            {lat && lng && (
-              <div className={styles.coordinates}>
-                🗺️ {lat.toFixed(6)}, {lng.toFixed(6)}
-              </div>
-            )}
-            {phone && (
-              <div className={styles.phone}>
-                📞 {phone}
-              </div>
-            )}
             {businessHours && (
               <div className={styles.businessHours}>
                 🕒 영업시간: {businessHours.mon || '정보 없음'}
