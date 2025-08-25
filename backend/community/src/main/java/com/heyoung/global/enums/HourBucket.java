@@ -1,6 +1,7 @@
 package com.heyoung.global.enums;
 
 import com.heyoung.domain.recommendation.exception.UserCategoryControllerAdvice;
+import com.heyoung.global.exception.ResponseCode;
 
 public enum HourBucket {
 
@@ -15,13 +16,11 @@ public enum HourBucket {
 
     private static final HourBucket[] VALUES = values();
 
-    /** 0~23 외 값이면 IllegalArgumentException */
     public static HourBucket of(int hour) {
-        if (hour < 0 || hour > 23) throw new UserCategoryControllerAdvice();
+        if (hour < 0 || hour > 23) throw new UserCategoryControllerAdvice(ResponseCode.HOUR_OUT_OF_RANGE);
         return VALUES[hour];
     }
 
-    /** Instant/ZoneId로부터 버킷 얻기 (UTC→KST 변환 등 사용할 때 유용) */
     public static HourBucket of(java.time.Instant instant, java.time.ZoneId zone) {
         int h = instant.atZone(zone).getHour();
         return VALUES[h];
