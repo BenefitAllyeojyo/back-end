@@ -41,6 +41,7 @@ jobs:
           restore-keys: ${{ runner.os }}-gradle
 
       - name: Build community server
+        working-directory: backend
         run: |
           chmod +x ./gradlew
           ./gradlew :community:clean :community:bootJar -x test --info
