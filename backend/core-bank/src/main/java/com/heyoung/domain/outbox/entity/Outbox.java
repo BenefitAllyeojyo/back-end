@@ -31,7 +31,7 @@ public class Outbox extends BaseEntity {
     private Long id;
 
     @Column(nullable = false, length = 50)
-    private OutboxType type; // 예: PaymentCompleted
+    private OutboxType type;
 
     @Column(nullable = false, columnDefinition = "jsonb")
     @JdbcTypeCode(SqlTypes.JSON)
@@ -41,7 +41,7 @@ public class Outbox extends BaseEntity {
     private Instant occurredAt;
 
     @Column(nullable = false, unique = true, length = 160)
-    private String uniqKey; // 멱등 키(예: "payment:777" 또는 UUID)
+    private String uniqKey;
 
     @Column(nullable = false)
     @Builder.Default
