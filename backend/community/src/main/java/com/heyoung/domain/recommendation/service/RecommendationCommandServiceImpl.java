@@ -6,6 +6,7 @@ import com.heyoung.domain.recommendation.dto.request.SaveUserCategoryRequest;
 import com.heyoung.domain.recommendation.dto.request.SaveUserHourHistRequest;
 import com.heyoung.domain.recommendation.dto.response.FailedResponseDto;
 import com.heyoung.domain.recommendation.dto.response.SaveResponse;
+import com.heyoung.domain.recommendation.entity.EventConsumeLog;
 import com.heyoung.domain.recommendation.entity.UserCategory;
 import com.heyoung.domain.recommendation.entity.UserHourHist;
 import com.heyoung.domain.recommendation.repository.EventConsumeLogRepository;
@@ -53,6 +54,8 @@ public class RecommendationCommandServiceImpl implements RecommendationCommandSe
                 HourBucket hourBucket = HourBucket.of(changeToHour(data.transactionDateTime()));
                 updateUserHourHist(getUserHourHist(data.userId(), hourBucket), data.userId(), hourBucket);
 
+                eventConsumeLogRepository.save(EventConsumeLog.builder().outboxId(data.outboxId()).build());
+
             } catch (Exception e) {
                 failed.add(new FailedResponseDto(data.outboxId(), e.getMessage()));
             }
@@ -78,6 +81,8 @@ public class RecommendationCommandServiceImpl implements RecommendationCommandSe
                 Optional<UserHourHist> found = getUserHourHist(data.userId(), hourBucket);
 
                 updateUserHourHist(found, data.userId(), hourBucket);
+
+                eventConsumeLogRepository.save(EventConsumeLog.builder().outboxId(data.outboxId()).build());
 
             } catch (Exception e) {
                 failed.add(new FailedResponseDto(data.outboxId(), e.getMessage()));
