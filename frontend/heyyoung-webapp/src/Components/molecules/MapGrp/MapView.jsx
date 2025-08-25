@@ -11,6 +11,7 @@ import GptInput from '../../atoms/Input/GptInput';
 import { stores, convertStoresToMarkers, mapConfig as defaultMapConfig } from '../../../mocks/stores';
 import { useStores } from '../../../hooks/useStores';
 import { fetchCategories, fetchStoresByCategory } from '../../../services/api';
+import rinoFaceImage from '../../../assets/images/character/RINO_Face.png';
 
 const MapView = ({ schoolName = '서울대학교', schoolColor }) => {
   const mapRef = useRef(null);
@@ -159,7 +160,7 @@ const MapView = ({ schoolName = '서울대학교', schoolColor }) => {
     
     // RINO_Face.png 이미지로 마커 생성 (패딩 포함하여 중앙 정렬)
     const markerImage = new kakao.maps.MarkerImage(
-      '/src/assets/images/character/RINO_Face.png',
+      rinoFaceImage,
       new kakao.maps.Size(60, 60), // 이미지 크기를 60x60으로 확대하여 더 명확한 표시
       {
         offset: new kakao.maps.Point(30, 30), // 이미지 중앙을 마커 위치에 맞춤
